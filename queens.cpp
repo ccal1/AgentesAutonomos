@@ -116,6 +116,23 @@ public:
         return Board(gene);
     }
 
+    void geneSwapMutate() {
+        int pos1 = rand()%SIZE;
+        int pos2 = rand()%SIZE;
+        while(pos2 == pos1) {
+            int pos2 = rand()%SIZE;
+        }
+
+        int gene1 = get(pos1);
+        int gene2 = get(pos2);
+        
+        clean(pos1);
+        clean(pos2);
+
+        set_value(pos1, gene2);
+        set_value(pos2, gene1);
+    }
+
 };
 
 Board* getParents(Board*, int*, Board*, int*);
