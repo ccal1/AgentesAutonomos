@@ -11,6 +11,7 @@
 #define ITERATIONS 10000
 #define GROUP_SIZE 5
 #define PARENTS_SIZE 2
+#define CHILDREN_SIZE 2
 
 using namespace std;
 
@@ -73,7 +74,7 @@ public:
 
     int getUntil(int pos) {
         int bitPos = pos * BITS;
-        return genome & (1<<bitPos - 1);
+        return genome & ~(-1<<bitPos);
     }
 
     int diff(int x, int y) {
@@ -100,7 +101,7 @@ public:
     Board crossOver(Board other, int pos) {
         int used = 0;
         int gene = getUntil(pos);
-        for(int i = 0; i <= pos; i++) {
+        for(int i = 0; i < pos; i++) {
             used |= 1<<get(pos);
         }
 
@@ -120,12 +121,14 @@ public:
 Board* getParents(Board*, int*, Board*, int*);
 int* getDistinct(int*, int);
 Board* addParentIfBetter(Board*, int*, Board, int);
+Board* Offspring_Gen(Board*, Board*);
 
 int main() {
     Board *pop = new Board[POPULATION_SIZE];
     int *chosen = new int[GROUP_SIZE];
     Board *parents = new Board[PARENTS_SIZE];
     int *parentsIdx = new int[PARENTS_SIZE];
+    Board *offspring = new Board[CHILDREN_SIZE];
 
     for(int i = 0; i<POPULATION_SIZE; i++) {
         pop[i] = Board();
@@ -134,7 +137,9 @@ int main() {
     for(int i = 0; i<ITERATIONS; i++) {
         chosen = getDistinct(chosen, GROUP_SIZE);
         parents = getParents(pop, chosen, parents, parentsIdx);
+        offspring = Offspring_Gen(parents,offspring);
         //ADD CROSS OVER, MUTATION AND SUBSTITUTION
+        
 
     }
 
@@ -142,6 +147,7 @@ int main() {
     delete[] chosen;
     delete[] parents;
     delete[] parentsIdx;
+    delete[] offspring;
 
     return 0;
 }
@@ -208,4 +214,22 @@ int* getDistinct(int* v, int n) {
         value = rand() % POPULATION_SIZE;
     }
     return v;
+}
+
+Board* Offspring_Gen(Board* parents, Board* offspring) {
+    int off_index = 0;
+    
+    for(int j = 0; j < PARENTS_SIZE; j++) {
+        
+        for (int k = j+1; k < PARENTS_SIZE; k++) {
+            int pos = rand() % (SIZE+1);
+            offspring[off_index++] = parents[j].crossOver(parents[k],pos);
+            
+            pos = rand() % (SIZE+1);
+            offspring[off_index++] = parents[k].crossOver(parents[j],pos);
+        }
+
+    }
+
+    return offspring;
 }
