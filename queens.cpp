@@ -105,7 +105,7 @@ public:
             used |= 1<<get(pos);
         }
 
-        for(int i = pos+1, idx = ( (pos + 1) * BITS ); i < 8 && idx < BITS_SIZE ; i++) {
+        for(int i = pos, idx = pos * BITS; i < SIZE && idx < BITS_SIZE; i++) {
             int value = other.get(i);
             if(!((1<<value) & used)) {
                 used |= 1 >> value;
