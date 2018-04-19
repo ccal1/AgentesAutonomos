@@ -3,12 +3,14 @@
 #include <vector>
 #include <algorithm>
 #include <time.h>
+#include <iostream>
+#include <stdio.h>
 
 #define SIZE 8
 #define BITS 3
 #define BITS_SIZE 24
 #define POPULATION_SIZE 100
-#define ITERATIONS 10000
+#define ITERATIONS 1
 #define GROUP_SIZE 5
 #define PARENTS_SIZE 2
 #define CHILDREN_SIZE 2
@@ -29,7 +31,7 @@ public:
         genome = 0;
         for(int i = 0; i < SIZE; i ++) {
 
-            genome |= v[i]>>(i * BITS);
+            genome |= v[i]<<(i * BITS);
 
         }
         calculateFit();
@@ -38,6 +40,14 @@ public:
     Board(int gene) {
         genome = gene;
         calculateFit();
+    }
+
+    int getFit() {
+        return this->fit;
+    }
+
+    int getGenome() {
+        return this->genome;
     }
 
     bool operator < (const Board& other) {
@@ -102,13 +112,13 @@ public:
         int used = 0;
         int gene = getUntil(pos);
         for(int i = 0; i < pos; i++) {
-            used |= 1<<get(pos);
+            used |= 1<<get(i);
         }
 
-        for(int i = pos, idx = pos * BITS; i < SIZE && idx < BITS_SIZE; i++) {
+        for(int i = pos, idx = pos * BITS; idx < BITS_SIZE; (++i)%=SIZE) {
             int value = other.get(i);
             if(!((1<<value) & used)) {
-                used |= 1 >> value;
+                used |= 1 << value;
                 gene |= value << idx;
                 idx += BITS;
             }
@@ -118,28 +128,36 @@ public:
 
     void geneSwapMutate() {
         int pos1 = rand()%SIZE;
-        int pos2 = rand()%SIZE;
-        while(pos2 == pos1) {
-            int pos2 = rand()%SIZE;
-        }
+        int pos2 = (pos1 + rand()%(SIZE-1) + 1)%SIZE;
 
         int gene1 = get(pos1);
         int gene2 = get(pos2);
         
-        clean(pos1);
-        clean(pos2);
-
         set_value(pos1, gene2);
         set_value(pos2, gene1);
+    }
+
+    void printGenome() {
+        for (int i = 0; i < SIZE; i++) {
+            cout << get(i) << " ";
+        }
+        cout << endl;
+    }
+
+    void printBoard() {
+        cout << getFit() << endl;
+        printGenome();
     }
 };
 
 Board* getParents(Board*, int*, Board*, int*);
 int* getDistinct(int*, int);
 Board* addParentIfBetter(Board*, int*, Board, int);
-Board* Offspring_Gen(Board*, Board*);
-Board* Mutate(Board*);
+Board* offspringGen(Board*, Board*);
+Board* mutate(Board*);
 Board* substituteParents(Board*, Board*);
+void printBoardVec(Board*, int);
+Board* replaceParents(Board*, Board*, int*);
 
 int main() {
     Board *pop = new Board[POPULATION_SIZE];
@@ -152,14 +170,29 @@ int main() {
         pop[i] = Board();
     }
 
+    cout << "Print Population" << endl;
+    printBoardVec(pop,POPULATION_SIZE);
+    cout << endl;
+
     for(int i = 0; i<ITERATIONS; i++) {
+        cout << "iteration: " << i+1 << endl; 
+
         chosen = getDistinct(chosen, GROUP_SIZE);
         parents = getParents(pop, chosen, parents, parentsIdx);
-        offspring = Offspring_Gen(parents,offspring);
-        offspring = Mutate(offspring);
+        printBoardVec(parents, PARENTS_SIZE);
+        offspring = offspringGen(parents,offspring);
+        printBoardVec(offspring,CHILDREN_SIZE);
+        offspring = mutate(offspring);
+        printBoardVec(offspring,CHILDREN_SIZE);
         //SUBSTITUTION
         sort(offspring, offspring + CHILDREN_SIZE);
+
         parents = substituteParents(parents, offspring);
+        printBoardVec(parents, PARENTS_SIZE);
+
+        pop = replaceParents(pop, parents, parentsIdx);
+
+        cout << endl;
 
     }
 
@@ -236,16 +269,18 @@ int* getDistinct(int* v, int n) {
     return v;
 }
 
-Board* Offspring_Gen(Board* parents, Board* offspring) {
+Board* offspringGen(Board* parents, Board* offspring) {
     int off_index = 0;
     
     for(int j = 0; j < PARENTS_SIZE; j++) {
         
         for (int k = j+1; k < PARENTS_SIZE; k++) {
-            int pos = rand() % (SIZE+1);
+            int pos = rand() % (SIZE);
+            pos = 7;
             offspring[off_index++] = parents[j].crossOver(parents[k],pos);
             
-            pos = rand() % (SIZE+1);
+            pos = rand() % (SIZE);
+            pos = 7;
             offspring[off_index++] = parents[k].crossOver(parents[j],pos);
         }
 
@@ -254,7 +289,7 @@ Board* Offspring_Gen(Board* parents, Board* offspring) {
     return offspring;
 }
 
-Board* Mutate(Board* offspring) {
+Board* mutate(Board* offspring) {
     for (int i = 0; i < CHILDREN_SIZE; i++) {
         if (rand() % 10 <= 3) {
             offspring[i].geneSwapMutate();
@@ -285,4 +320,17 @@ Board* substituteParents(Board *parents, Board *offspring) {
     delete[] parents;
 
     return Temp;
+}
+
+Board* replaceParents(Board* pop, Board *parents, int* parentsIdx) {
+    for (int i = 0; i < PARENTS_SIZE; i++) {
+        pop[parentsIdx[i]] = parents[i];
+    }
+    return pop;
+}
+
+void printBoardVec(Board* Array, int sizeArray) {
+    for (int i = 0; i < sizeArray; i++) {
+        Array[i].printBoard();
+    }
 }
