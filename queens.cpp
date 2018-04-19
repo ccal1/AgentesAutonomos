@@ -116,12 +116,16 @@ public:
         return Board(gene);
     }
 
+    void geneSwapMutate() {}
+
 };
 
 Board* getParents(Board*, int*, Board*, int*);
 int* getDistinct(int*, int);
 Board* addParentIfBetter(Board*, int*, Board, int);
 Board* Offspring_Gen(Board*, Board*);
+Board* Mutate(Board*);
+Board* substituteParents(Board*, Board*);
 
 int main() {
     Board *pop = new Board[POPULATION_SIZE];
@@ -138,8 +142,10 @@ int main() {
         chosen = getDistinct(chosen, GROUP_SIZE);
         parents = getParents(pop, chosen, parents, parentsIdx);
         offspring = Offspring_Gen(parents,offspring);
-        //ADD CROSS OVER, MUTATION AND SUBSTITUTION
-        
+        offspring = Mutate(offspring);
+        //SUBSTITUTION
+        sort(offspring, offspring + CHILDREN_SIZE);
+        parents = substituteParents(parents, offspring);
 
     }
 
@@ -232,4 +238,37 @@ Board* Offspring_Gen(Board* parents, Board* offspring) {
     }
 
     return offspring;
+}
+
+Board* Mutate(Board* offspring) {
+    for (int i = 0; i < CHILDREN_SIZE; i++) {
+        if (rand() % 10 <= 3) {
+            offspring[i].geneSwapMutate();
+        }
+    }
+    return offspring;
+}
+
+Board* substituteParents(Board *parents, Board *offspring) {
+    Board* Temp = new Board[PARENTS_SIZE];
+    int par_index = 0, off_index = 0, temp_index = 0;
+
+    while (par_index < PARENTS_SIZE && off_index < CHILDREN_SIZE) {
+        
+        if (parents[par_index] < offspring[off_index]) {
+
+            Temp[temp_index++] = parents[par_index++];
+        
+        }
+        else {
+
+            Temp[temp_index++] = offspring[off_index++];    
+
+        }
+
+    }
+
+    delete[] parents;
+
+    return Temp;
 }
