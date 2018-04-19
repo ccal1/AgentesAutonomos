@@ -276,11 +276,9 @@ Board* offspringGen(Board* parents, Board* offspring) {
         
         for (int k = j+1; k < PARENTS_SIZE; k++) {
             int pos = rand() % (SIZE);
-            pos = 7;
             offspring[off_index++] = parents[j].crossOver(parents[k],pos);
             
             pos = rand() % (SIZE);
-            pos = 7;
             offspring[off_index++] = parents[k].crossOver(parents[j],pos);
         }
 
