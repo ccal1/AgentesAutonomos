@@ -161,6 +161,9 @@ Board* replaceParents(Board*, Board*, int*);
 int getCrossoverPos();
 
 int main() {
+    // Setting srand argument to generate random sequence
+    srand (time(NULL));
+
     Board *pop = new Board[POPULATION_SIZE];
     int *chosen = new int[GROUP_SIZE];
     Board *parents = new Board[PARENTS_SIZE];
@@ -191,10 +194,11 @@ int main() {
         // Applying Mutation
         offspring = mutate(offspring);
 
-        //Substitution
+        //Sorting Offspring
         sort(offspring, offspring + CHILDREN_SIZE);
         printBoardVec(offspring,CHILDREN_SIZE);
 
+        // Substitution
         parents = substituteParents(parents, offspring);
         printBoardVec(parents, PARENTS_SIZE);
 
