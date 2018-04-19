@@ -10,7 +10,7 @@
 #define BITS 3
 #define BITS_SIZE 24
 #define POPULATION_SIZE 100
-#define ITERATIONS 1
+#define ITERATIONS 100
 #define GROUP_SIZE 5
 #define PARENTS_SIZE 2
 #define CHILDREN_SIZE 2
@@ -158,6 +158,7 @@ Board* mutate(Board*);
 Board* substituteParents(Board*, Board*);
 void printBoardVec(Board*, int);
 Board* replaceParents(Board*, Board*, int*);
+int getCrossoverPos();
 
 int main() {
     Board *pop = new Board[POPULATION_SIZE];
@@ -183,9 +184,9 @@ int main() {
         offspring = offspringGen(parents,offspring);
         printBoardVec(offspring,CHILDREN_SIZE);
         offspring = mutate(offspring);
-        printBoardVec(offspring,CHILDREN_SIZE);
         //SUBSTITUTION
         sort(offspring, offspring + CHILDREN_SIZE);
+        printBoardVec(offspring,CHILDREN_SIZE);
 
         parents = substituteParents(parents, offspring);
         printBoardVec(parents, PARENTS_SIZE);
@@ -207,7 +208,7 @@ int main() {
 
 Board* getParents(Board* pop, int* chosen, Board* parents, int* parentsIdx) {
 
-    if(pop[chosen[0]] > pop[chosen[1]]) {
+    if(pop[chosen[0]] < pop[chosen[1]]) {
         parentsIdx[0] = chosen[0];
         parentsIdx[1] = chosen[1];
     }
@@ -228,7 +229,7 @@ Board* getParents(Board* pop, int* chosen, Board* parents, int* parentsIdx) {
 Board* addParentIfBetter(Board* parents, int *parentsIdx, Board other, int otherIdx) {
     int change = 0;
     for(int i = PARENTS_SIZE - 1; i >= 0 ; i--) {
-        if(parents[i] > other){
+        if(parents[i] < other){
             change = i+1;
             break;
         }
@@ -275,10 +276,10 @@ Board* offspringGen(Board* parents, Board* offspring) {
     for(int j = 0; j < PARENTS_SIZE; j++) {
         
         for (int k = j+1; k < PARENTS_SIZE; k++) {
-            int pos = rand() % (SIZE);
+            int pos = getCrossoverPos();
             offspring[off_index++] = parents[j].crossOver(parents[k],pos);
             
-            pos = rand() % (SIZE);
+            pos = getCrossoverPos();
             offspring[off_index++] = parents[k].crossOver(parents[j],pos);
         }
 
@@ -331,4 +332,10 @@ void printBoardVec(Board* Array, int sizeArray) {
     for (int i = 0; i < sizeArray; i++) {
         Array[i].printBoard();
     }
+}
+
+int getCrossoverPos() {
+    int pos = rand() % (SIZE-1) + 1;
+    if (rand() % 10 == 9) pos = 0;
+    return pos;
 }
