@@ -152,7 +152,7 @@ public:
 
 Board* getParents(Board*, int*, Board*, int*);
 int* getDistinct(int*, int);
-Board* addParentIfBetter(Board*, int*, Board, int);
+Board* replaceParentIfBetter(Board*, int*, Board, int);
 Board* offspringGen(Board*, Board*);
 Board* mutate(Board*);
 Board* substituteParents(Board*, Board*);
@@ -167,6 +167,7 @@ int main() {
     int *parentsIdx = new int[PARENTS_SIZE];
     Board *offspring = new Board[CHILDREN_SIZE];
 
+    // Generating initial Population
     for(int i = 0; i<POPULATION_SIZE; i++) {
         pop[i] = Board();
     }
@@ -178,13 +179,19 @@ int main() {
     for(int i = 0; i<ITERATIONS; i++) {
         cout << "iteration: " << i+1 << endl; 
 
+        // Getting parents
         chosen = getDistinct(chosen, GROUP_SIZE);
         parents = getParents(pop, chosen, parents, parentsIdx);
         printBoardVec(parents, PARENTS_SIZE);
+
+        // Generating Offspring
         offspring = offspringGen(parents,offspring);
         printBoardVec(offspring,CHILDREN_SIZE);
+
+        // Applying Mutation
         offspring = mutate(offspring);
-        //SUBSTITUTION
+
+        //Substitution
         sort(offspring, offspring + CHILDREN_SIZE);
         printBoardVec(offspring,CHILDREN_SIZE);
 
@@ -221,12 +228,12 @@ Board* getParents(Board* pop, int* chosen, Board* parents, int* parentsIdx) {
     parents[1] = pop[parentsIdx[1]];
 
     for(int i = 2; i < GROUP_SIZE; i++) {
-        parents = addParentIfBetter(parents, parentsIdx, pop[chosen[i]], chosen[i]);
+        parents = replaceParentIfBetter(parents, parentsIdx, pop[chosen[i]], chosen[i]);
     }
     return parents;
 }
 
-Board* addParentIfBetter(Board* parents, int *parentsIdx, Board other, int otherIdx) {
+Board* replaceParentIfBetter(Board* parents, int *parentsIdx, Board other, int otherIdx) {
     int change = 0;
     for(int i = PARENTS_SIZE - 1; i >= 0 ; i--) {
         if(parents[i] < other){
