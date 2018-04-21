@@ -43,6 +43,9 @@ int main() {
         pop[i] = Board();
     }
 
+    //Sorting population
+    sort(pop,pop+POPULATION_SIZE);
+
     cout << "Print Population" << endl;
     printBoardVec(pop,POPULATION_SIZE);
     cout << endl;
@@ -71,6 +74,10 @@ int main() {
         printBoardVec(parents, PARENTS_SIZE);
 
         pop = replaceParents(pop, parents, parentsIdx);
+
+        //Sorting population
+        sort(pop,pop+POPULATION_SIZE);
+
 		if(finished(pop, parentsIdx))break;
         cout << endl;
 
