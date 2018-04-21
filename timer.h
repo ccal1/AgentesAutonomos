@@ -2,22 +2,19 @@
 #define _H_TIMER_
 #include <chrono>
 
+using namespace std::chrono;
 
 class Timer {
 private:
     bool paused;
-    std::chrono::high_resolution_clock::time_point timebegin, timeend;
-    std::chrono::nanoseconds::rep nanoseconds;
+    high_resolution_clock::time_point timebegin, timeend;
+    nanoseconds::rep nanoseconds;
+    milliseconds duration;
 public:
     Timer(); // Starts automatically on construction
-    double getSeconds();
     double getMilliseconds();
-    double getMicroseconds();
-    double getNanoseconds();
-    double getInFPS();
     void start();
-    void stop();
-    void resume();
+    void pause();
     bool isPaused();
 };
 

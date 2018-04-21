@@ -6,6 +6,7 @@
 #include <iostream>
 #include <stdio.h>
 #include "board.h"
+#include "timer.h"
 
 #define POPULATION_SIZE 100
 #define ITERATIONS 10000
@@ -31,7 +32,7 @@ pair<double, double> generateStatistics(Board*, int);
 int main() {
     // Setting srand argument to generate random sequence
     srand (time(NULL));
-
+    Timer timer = Timer();
     Board *pop = new Board[POPULATION_SIZE];
     int *chosen = new int[GROUP_SIZE];
     Board *parents = new Board[PARENTS_SIZE];
@@ -59,35 +60,44 @@ int main() {
         // Getting parents
         chosen = getDistinct(chosen, GROUP_SIZE);
         parents = getParents(pop, chosen, parents, parentsIdx);
+        timer.pause();
         printBoardVec(parents, PARENTS_SIZE);
+        timer.start();
 
         // Generating Offspring
         offspring = offspringGen(parents,offspring);
+        timer.pause();
         printBoardVec(offspring,CHILDREN_SIZE);
-
+        timer.start();
         // Applying Mutation
         offspring = mutate(offspring);
 
         //Sorting Offspring
         sort(offspring, offspring + CHILDREN_SIZE);
+        timer.pause();
         printBoardVec(offspring,CHILDREN_SIZE);
-
+        timer.start();
         // Substitution
         parents = substituteParents(parents, offspring);
+        timer.pause();
         printBoardVec(parents, PARENTS_SIZE);
+        timer.start();
 
         pop = replaceParents(pop, parents, parentsIdx);
 
         //Sorting population
+        timer.pause(); 
         sort(pop,pop+POPULATION_SIZE);
         statistics.push_back(generateStatistics(pop, POPULATION_SIZE));
         bestBoard.push_back(pop[0].getFit());
+        timer.start();
 
 		if(pop[0].getFit() == 0) break;
         cout << endl;
 
     }
     
+    cout<<"Time: "<<timer.getMilliseconds()<<"\n";
     cout<<"\nAverage:\n";
     for(int i = 0; i<statistics.size(); i++){
         cout<<statistics[i].first<< " ";
@@ -100,7 +110,7 @@ int main() {
     }
     cout<<"\n\n";
     
-    cout<<"Best by iteration\n";
+    cout<<"Best by iteration:\n";
     for(int i = 0; i<bestBoard.size(); i++){
         cout<< bestBoard[i] << " ";
     }
