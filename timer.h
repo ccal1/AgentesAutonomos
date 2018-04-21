@@ -8,11 +8,12 @@ class Timer {
 private:
     bool paused;
     high_resolution_clock::time_point timebegin, timeend;
-    nanoseconds::rep nanoseconds;
-    milliseconds duration;
+    nanoseconds duration;
+
 public:
     Timer(); // Starts automatically on construction
     double getMilliseconds();
+    double getNanoseconds();
     void start();
     void pause();
     bool isPaused();
