@@ -5,10 +5,8 @@
 #include <time.h>
 #include <iostream>
 #include <stdio.h>
+#include "board.h"
 
-#define SIZE 8
-#define BITS 3
-#define BITS_SIZE 24
 #define POPULATION_SIZE 100
 #define ITERATIONS 10000
 #define GROUP_SIZE 5
@@ -17,138 +15,6 @@
 
 using namespace std;
 
-class Board {
-private:
-    int genome;
-    int fit;
-
-public:
-    Board() {
-        vector<char> v;
-        for(char i = 0 ; i < SIZE; i++) v.push_back(i);
-        random_shuffle(v.begin(), v.end());
-
-        genome = 0;
-        for(int i = 0; i < SIZE; i ++) {
-
-            genome |= v[i]<<(i * BITS);
-
-        }
-        calculateFit();
-    }
-
-    Board(int gene) {
-        genome = gene;
-        calculateFit();
-    }
-
-    int getFit() {
-        return this->fit;
-    }
-
-    int getGenome() {
-        return this->genome;
-    }
-
-    bool operator < (const Board& other) {
-        return fit < other.fit;
-    }
-
-    bool operator> (const Board& other) {
-        return fit > other.fit;
-    }
-
-
-    void permute(int x, int y) {
-        int temp = get(x);
-        set_value(x, get(y));
-        set_value(y, temp);
-    }
-
-    void set_value(int pos, int value) {
-        int bitPos = pos * BITS;
-        int gene = clean(pos);
-        gene |= value << bitPos;
-        genome = gene;
-    }
-
-    int clean(int pos) {
-        int bitPos = pos * BITS;
-        return ~(7 << bitPos) & genome;
-    }
-
-    int get(int pos) {
-        int bitPos = pos * BITS;
-        return ((7 << bitPos) & genome) >> bitPos;
-    }
-
-    int getUntil(int pos) {
-        int bitPos = pos * BITS;
-        return genome & ~(-1<<bitPos);
-    }
-
-    int diff(int x, int y) {
-        return abs(get(x) - get(y));
-    }
-
-    int hitsToRight(int pos) {
-        int hits = 0;
-        for(int i = pos+1; i < SIZE; i++) {
-            int posDiff = i - pos;
-            hits += ( posDiff == diff(pos, i) );
-        }
-        return hits;
-    }
-
-    void calculateFit() {
-        fit = 0;
-        for(int i = 0; i < SIZE; i++)
-        {
-            fit+=hitsToRight(i);
-        }
-    }
-
-    Board crossOver(Board other, int pos) {
-        int used = 0;
-        int gene = getUntil(pos);
-        for(int i = 0; i < pos; i++) {
-            used |= 1<<get(i);
-        }
-
-        for(int i = pos, idx = pos * BITS; idx < BITS_SIZE; (++i)%=SIZE) {
-            int value = other.get(i);
-            if(!((1<<value) & used)) {
-                used |= 1 << value;
-                gene |= value << idx;
-                idx += BITS;
-            }
-        }
-        return Board(gene);
-    }
-
-    void geneSwapMutate() {
-        int pos1 = rand()%SIZE;
-        int pos2 = (pos1 + rand()%(SIZE-1) + 1)%SIZE;
-
-        int gene1 = get(pos1);
-        int gene2 = get(pos2);
-        
-        set_value(pos1, gene2);
-        set_value(pos2, gene1);
-    }
-
-    void printGenome() {
-        for (int i = 0; i < SIZE; i++) {
-            cout << get(i) << " ";
-        }
-        cout << endl;
-    }
-
-    void printBoard() {
-        cout << getFit() << endl;
-        printGenome();
-    }
-};
 
 Board* getParents(Board*, int*, Board*, int*);
 int* getDistinct(int*, int);
@@ -176,9 +42,6 @@ int main() {
     for(int i = 0; i<POPULATION_SIZE; i++) {
         pop[i] = Board();
     }
-
-    //Sorting population
-    sort(pop,pop+POPULATION_SIZE);
 
     cout << "Print Population" << endl;
     printBoardVec(pop,POPULATION_SIZE);
@@ -208,11 +71,6 @@ int main() {
         printBoardVec(parents, PARENTS_SIZE);
 
         pop = replaceParents(pop, parents, parentsIdx);
-
-        //Sorting population
-        sort(pop,pop+POPULATION_SIZE);
-
-        // Verifying stop condition
 		if(finished(pop, parentsIdx))break;
         cout << endl;
 
