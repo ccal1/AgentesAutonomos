@@ -83,7 +83,7 @@ int main() {
         statistics.push_back(generateStatistics(pop, POPULATION_SIZE));
         bestBoard.push_back(pop[0].getFit());
 
-		if(finished(pop, parentsIdx))break;
+		if(pop[0].getFit() == 0) break;
         cout << endl;
 
     }
@@ -233,7 +233,7 @@ Board* substituteParents(Board *parents, Board *offspring) {
 
 Board* replaceParents(Board* pop, Board *parents, int* parentsIdx) {
     for (int i = 0; i < PARENTS_SIZE; i++) {
-        pop[parentsIdx[i]] = parents[i];
+        pop[parentsIdx[i]] = parents[i];        
     }
     return pop;
 }
