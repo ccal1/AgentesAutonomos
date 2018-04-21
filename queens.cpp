@@ -26,6 +26,7 @@ void printBoardVec(Board*, int);
 Board* replaceParents(Board*, Board*, int*);
 int getCrossoverPos();
 bool finished(Board*, int*);
+pair<double, double> generateStatistics(Board*, int);
 
 int main() {
     // Setting srand argument to generate random sequence
@@ -36,6 +37,8 @@ int main() {
     Board *parents = new Board[PARENTS_SIZE];
     int *parentsIdx = new int[PARENTS_SIZE];
     Board *offspring = new Board[CHILDREN_SIZE];
+    vector<pair<double, double> > statistics;
+    vector<int> bestBoard; 
 
 
     // Generating initial Population
@@ -56,7 +59,7 @@ int main() {
         // Getting parents
         chosen = getDistinct(chosen, GROUP_SIZE);
         parents = getParents(pop, chosen, parents, parentsIdx);
-        printBoardVec(parents, PARENTS_SIZE);
+        // printBoardVec(parents, PARENTS_SIZE);
 
         // Generating Offspring
         offspring = offspringGen(parents,offspring);
@@ -77,11 +80,32 @@ int main() {
 
         //Sorting population
         sort(pop,pop+POPULATION_SIZE);
+        statistics.push_back(generateStatistics(pop, POPULATION_SIZE));
+        bestBoard.push_back(pop[0].getFit());
 
 		if(finished(pop, parentsIdx))break;
         cout << endl;
 
     }
+    
+    cout<<"\nAverage:\n";
+    for(int i = 0; i<statistics.size(); i++){
+        cout<<statistics[i].first<< " ";
+    }
+    cout<<"\n\n";
+    
+    cout<<"Standard Deviation:\n";
+    for(int i = 0; i<statistics.size(); i++){
+        cout<< statistics[i].second << " ";
+    }
+    cout<<"\n\n";
+    
+    cout<<"Best by iteration\n";
+    for(int i = 0; i<bestBoard.size(); i++){
+        cout<< bestBoard[i] << " ";
+    }
+    cout<<"\n";
+
 
     delete[] pop;
     delete[] chosen;
@@ -231,4 +255,20 @@ int getCrossoverPos() {
     int pos = rand() % (SIZE-1) + 1;
     if (rand() % 10 == 9) pos = 0;
     return pos;
+}
+
+pair<double, double> generateStatistics(Board * pop, int n) {
+    double sum = 0;
+    for(int i = 0; i<n; i++) {
+        sum += pop[i].getFit();
+    }
+    double avg = sum/n;
+
+    double deltaSum = 0;
+    for(int i = 0; i < n; i++) {
+        double delta = avg - pop[i].getFit();
+        deltaSum += sqrt(delta * delta);
+    }
+    double stdDeviation = deltaSum/n;
+    return pair<double, double>(avg, stdDeviation);
 }
