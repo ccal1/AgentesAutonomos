@@ -8,14 +8,34 @@
 #include "board.h"
 #include "timer.h"
 
+#define EXEC_NUMBER 40
 #define POPULATION_SIZE 100
-#define ITERATIONS 10000
+#define ITERATIONS 1000
 #define GROUP_SIZE 5
 #define PARENTS_SIZE 2
 #define CHILDREN_SIZE 2
 
 using namespace std;
 
+struct statStruc {
+    Timer timer;
+    vector<pair<double,double> > statistics;
+    vector<int> bestBoard;
+    int numInter;
+    
+    statStruc() {}
+    statStruc(Timer timer_, vector<pair<double,double> > statistics_, vector<int> bestBoard_, int numInter_) : timer(timer_), statistics(statistics_), bestBoard(bestBoard_), numInter(numInter_) {}
+
+};
+
+struct resultsStruc {
+    pair<double,double> timerStat;
+    vector<pair<double,double> > resultStat;
+    vector<pair<double,double> > bestBoardStat;
+
+    resultsStruc() {}
+    resultsStruc(pair<double,double> timerStat_, vector<pair<double,double> > resultStat_, vector<pair<double,double> > bestBoardStat_) : timerStat(timerStat_), resultStat(resultStat_), bestBoardStat(bestBoardStat_) {}
+};
 
 Board* getParents(Board*, int*, Board*, int*);
 int* getDistinct(int*, int);
@@ -28,18 +48,63 @@ Board* replaceParents(Board*, Board*, int*);
 int getCrossoverPos();
 bool finished(Board*, int*);
 pair<double, double> generateStatistics(Board*, int);
+statStruc geneticAlgorithm();
+resultsStruc generateResults (vector<statStruc>);
 
 int main() {
     // Setting srand argument to generate random sequence
+    vector<statStruc> Results(EXEC_NUMBER);
+    resultsStruc finalResults;
+
+    for (unsigned int i = 0; i < Results.size(); i++) {
+        Results[i] = geneticAlgorithm();
+    }
+
+    finalResults = generateResults(Results);
+
+    cout<<"Time Average: "<<finalResults.timerStat.first<<"\n";
+    cout<<"Time Standard Deviation: "<<finalResults.timerStat.second<<"\n";
+    cout<<"\nAverage:\n";
+    for(unsigned int i = 0; i<finalResults.resultStat.size(); i++){
+        cout<<finalResults.resultStat[i].first<< " ";
+    }
+    cout<<"\n\n";
+    
+    cout<<"Standard Deviation:\n";
+    for(unsigned int i = 0; i<finalResults.resultStat.size(); i++){
+        cout<< finalResults.resultStat[i].second << " ";
+    }
+    cout<<"\n\n";
+    
+    cout<<"Best by iteration Average: \n";
+    for(unsigned int i = 0; i < finalResults.bestBoardStat.size(); i++){
+        cout<< finalResults.bestBoardStat[i].first << " ";
+    }
+    cout<<"\n";
+
+    cout<<"Best by iteration Standard Deviation: \n";
+    for(unsigned int i = 0; i < finalResults.bestBoardStat.size(); i++){
+        cout<< finalResults.bestBoardStat[i].second << " ";
+    }
+    cout<<"\n";
+
+    Results.clear();
+
+    return 0;
+}
+
+statStruc geneticAlgorithm () {
     srand (time(NULL));
-    Timer timer = Timer();
+    Timer timer = Timer(), timerEnd;
     Board *pop = new Board[POPULATION_SIZE];
     int *chosen = new int[GROUP_SIZE];
     Board *parents = new Board[PARENTS_SIZE];
     int *parentsIdx = new int[PARENTS_SIZE];
     Board *offspring = new Board[CHILDREN_SIZE];
     vector<pair<double, double> > statistics;
-    vector<int> bestBoard; 
+    vector<int> bestBoard;
+    bool end = false;
+    int numInter = 0;
 
 
     // Generating initial Population
@@ -50,38 +115,40 @@ int main() {
     //Sorting population
     sort(pop,pop+POPULATION_SIZE);
 
-    cout << "Print Population" << endl;
-    printBoardVec(pop,POPULATION_SIZE);
-    cout << endl;
+    //cout << "Print Population" << endl;
+    //printBoardVec(pop,POPULATION_SIZE);
+    //cout << endl;
 
     for(int i = 0; i<ITERATIONS; i++) {
-        cout << "iteration: " << i+1 << endl; 
+        //cout << "iteration: " << i+1 << endl; 
 
         // Getting parents
         chosen = getDistinct(chosen, GROUP_SIZE);
         parents = getParents(pop, chosen, parents, parentsIdx);
-        timer.pause();
-        printBoardVec(parents, PARENTS_SIZE);
-        timer.start();
+        // timer.pause();
+        // printBoardVec(parents, PARENTS_SIZE);
+        // timer.start();
 
         // Generating Offspring
         offspring = offspringGen(parents,offspring);
-        timer.pause();
-        printBoardVec(offspring,CHILDREN_SIZE);
-        timer.start();
+        // timer.pause();
+        // printBoardVec(offspring,CHILDREN_SIZE);
+        // timer.start();
+        
         // Applying Mutation
         offspring = mutate(offspring);
 
         //Sorting Offspring
         sort(offspring, offspring + CHILDREN_SIZE);
-        timer.pause();
-        printBoardVec(offspring,CHILDREN_SIZE);
-        timer.start();
+        // timer.pause();
+        // printBoardVec(offspring,CHILDREN_SIZE);
+        // timer.start();
+        
         // Substitution
         parents = substituteParents(parents, offspring);
-        timer.pause();
-        printBoardVec(parents, PARENTS_SIZE);
-        timer.start();
+        // timer.pause();
+        // printBoardVec(parents, PARENTS_SIZE);
+        // timer.start();
 
         pop = replaceParents(pop, parents, parentsIdx);
 
@@ -92,30 +159,35 @@ int main() {
         bestBoard.push_back(pop[0].getFit());
         timer.start();
 
-		if(pop[0].getFit() == 0) break;
-        cout << endl;
+        if(pop[0].getFit() == 0 && !end)  {
+            timer.pause();
+            timerEnd = timer;
+            numInter = i;
+            end = true;
+        }
+        // cout << endl;
 
     }
     
-    cout<<"Time: "<<timer.getMilliseconds()<<"\n";
-    cout<<"\nAverage:\n";
-    for(int i = 0; i<statistics.size(); i++){
-        cout<<statistics[i].first<< " ";
-    }
-    cout<<"\n\n";
+    // Iteration Statistics Print
+    // cout<<"Time: "<<timer.getNanoseconds()<<"\n";
+    // cout<<"\nAverage:\n";
+    // for(int i = 0; i<statistics.size(); i++){
+    //     cout<<statistics[i].first<< " ";
+    // }
+    // cout<<"\n\n";
     
-    cout<<"Standard Deviation:\n";
-    for(int i = 0; i<statistics.size(); i++){
-        cout<< statistics[i].second << " ";
-    }
-    cout<<"\n\n";
+    // cout<<"Standard Deviation:\n";
+    // for(int i = 0; i<statistics.size(); i++){
+    //     cout<< statistics[i].second << " ";
+    // }
+    // cout<<"\n\n";
     
-    cout<<"Best by iteration:\n";
-    for(int i = 0; i<bestBoard.size(); i++){
-        cout<< bestBoard[i] << " ";
-    }
-    cout<<"\n";
-
+    // cout<<"Best by iteration:\n";
+    // for(int i = 0; i<bestBoard.size(); i++){
+    //     cout<< bestBoard[i] << " ";
+    // }
+    // cout<<"\n";
 
     delete[] pop;
     delete[] chosen;
@@ -123,7 +195,7 @@ int main() {
     delete[] parentsIdx;
     delete[] offspring;
 
-    return 0;
+    return statStruc(timerEnd, statistics, bestBoard, numInter);
 }
 
 Board* getParents(Board* pop, int* chosen, Board* parents, int* parentsIdx) {
@@ -281,4 +353,52 @@ pair<double, double> generateStatistics(Board * pop, int n) {
     }
     double stdDeviation = deltaSum/n;
     return pair<double, double>(avg, stdDeviation);
+}
+
+resultsStruc generateResults (vector<statStruc> Results) {
+    pair<double,double> timerStat(0,0);
+    vector<pair<double,double> > resultStat(ITERATIONS,pair<double,double>(0,0));
+    vector<pair<double,double> > bestBoardStat(ITERATIONS,pair<double,double>(0,0));
+
+    // Calculations for Timer
+    for (unsigned int i = 0; i < Results.size(); i++) {
+        timerStat.first += Results[i].timer.getNanoseconds();
+    }
+    timerStat.first = timerStat.first/Results.size();
+
+    for(unsigned int i = 0; i < Results.size(); i++) {
+        double delta = timerStat.first - Results[i].timer.getNanoseconds();
+        timerStat.second += sqrt(delta * delta);
+    }
+    timerStat.second = timerStat.second/Results.size();
+
+    // Calculations for statistics
+    for (int i = 0; i < ITERATIONS; i++) {
+        for (unsigned int j = 0; j < Results.size(); j++) {
+            resultStat[i].first += Results[j].statistics[i].first;
+        }
+        resultStat[i].first = resultStat[i].first/Results.size();
+
+        for(unsigned int j = 0; j < Results.size(); j++) {
+            double delta = Results[j].statistics[i].first - resultStat[i].first;
+            resultStat[i].second += sqrt(delta * delta);
+        }
+        resultStat[i].second = resultStat[i].second/Results.size();
+    }
+
+    // Calculations for bestBoard
+    for (int i = 0; i < ITERATIONS; i++) {
+        for (unsigned int j = 0; j < Results.size(); j++) {
+            bestBoardStat[i].first += Results[j].bestBoard[i];
+        }
+        bestBoardStat[i].first = bestBoardStat[i].first/Results.size();
+
+        for(unsigned int j = 0; j < Results.size(); j++) {
+            double delta = Results[j].bestBoard[i] - bestBoardStat[i].first;
+            bestBoardStat[i].second += sqrt(delta * delta);
+        }
+        bestBoardStat[i].second = bestBoardStat[i].second/Results.size();
+    }
+
+    return resultsStruc(timerStat, resultStat, bestBoardStat);
 }
