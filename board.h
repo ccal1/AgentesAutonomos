@@ -1,8 +1,13 @@
+#ifndef BOARD_H
+#define BOARD_H
+
+
 #define SIZE 8
 #define BITS 3
 #define BITS_SIZE 24
 
 using namespace std;
+
 #include <iostream>
 #include <time.h>
 #include <math.h>
@@ -36,3 +41,5 @@ public:
      void printGenome();
 	 void printBoard();     
 };
+
+#endif
