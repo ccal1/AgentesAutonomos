@@ -22,6 +22,7 @@ private:
     int genome;
     int fit;
     int hitsPos;
+	int getNthSetBit(int, int);
 
 public:
 	 Board();
@@ -47,7 +48,6 @@ public:
      int countBits(int);
 	 void printBoard();
 	 void smartMutate();
-	 int getNthSetBit(int, int);
 	 void someHitSwapMutate();
 	 int findHitsBitmask();
 	 void geneSwap(int pos1, int pos2);

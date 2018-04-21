@@ -167,7 +167,7 @@ int Board::countBits(int x) {
 
 int Board::getNthSetBit(int mask, int count) {
     int bit = mask & -mask;
-    while(--count) {
+    while(count--) {
         mask^=bit;
         bit = mask & -mask;
     }
@@ -194,9 +194,6 @@ void Board::someHitSwapMutate() {
         geneSwap(pos1, pos2);
         calculateFit();
     }
-
-
-    calculateFit();
 }
 
 int Board::findHitsBitmask() {
