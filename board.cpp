@@ -112,6 +112,8 @@ void Board::geneSwapMutate() {
     
     set_value(pos1, gene2);
     set_value(pos2, gene1);
+
+    calculateFit();
 }
 
 void Board::printGenome() {
