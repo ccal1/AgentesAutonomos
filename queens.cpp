@@ -59,7 +59,7 @@ int main() {
         // Getting parents
         chosen = getDistinct(chosen, GROUP_SIZE);
         parents = getParents(pop, chosen, parents, parentsIdx);
-        // printBoardVec(parents, PARENTS_SIZE);
+        printBoardVec(parents, PARENTS_SIZE);
 
         // Generating Offspring
         offspring = offspringGen(parents,offspring);
