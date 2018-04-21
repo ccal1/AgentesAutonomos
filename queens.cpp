@@ -10,7 +10,7 @@
 #define BITS 3
 #define BITS_SIZE 24
 #define POPULATION_SIZE 100
-#define ITERATIONS 100
+#define ITERATIONS 10000
 #define GROUP_SIZE 5
 #define PARENTS_SIZE 2
 #define CHILDREN_SIZE 2
@@ -159,6 +159,7 @@ Board* substituteParents(Board*, Board*);
 void printBoardVec(Board*, int);
 Board* replaceParents(Board*, Board*, int*);
 int getCrossoverPos();
+bool finished(Board*, int*);
 
 int main() {
     // Setting srand argument to generate random sequence
@@ -169,6 +170,7 @@ int main() {
     Board *parents = new Board[PARENTS_SIZE];
     int *parentsIdx = new int[PARENTS_SIZE];
     Board *offspring = new Board[CHILDREN_SIZE];
+
 
     // Generating initial Population
     for(int i = 0; i<POPULATION_SIZE; i++) {
@@ -203,7 +205,7 @@ int main() {
         printBoardVec(parents, PARENTS_SIZE);
 
         pop = replaceParents(pop, parents, parentsIdx);
-
+		if(finished(pop, parentsIdx))break;
         cout << endl;
 
     }
@@ -337,6 +339,13 @@ Board* replaceParents(Board* pop, Board *parents, int* parentsIdx) {
         pop[parentsIdx[i]] = parents[i];
     }
     return pop;
+}
+
+bool finished(Board* pop, int* parentIdx){
+	for (int i = 0; i < PARENTS_SIZE; i++){
+		if(pop[parentIdx[i]].getFit() == 0) return true;
+	}
+	return false;
 }
 
 void printBoardVec(Board* Array, int sizeArray) {
