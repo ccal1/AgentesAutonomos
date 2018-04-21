@@ -5,6 +5,7 @@
 #define SIZE 8
 #define BITS 3
 #define BITS_SIZE 24
+#define MAX_ERROR ((SIZE * (SIZE -1)) / 2)
 
 using namespace std;
 
@@ -20,11 +21,15 @@ class Board {
 private:
     int genome;
     int fit;
+    int hitsPos;
 
 public:
 	 Board();
 	 Board(int);
 	 int getFit();
+	 double exponentialFit();
+	 double parabolicFit();
+	 double linearFit(); 
 	 int getGenome();
 	 bool operator < (const Board&); 
 	 bool operator > (const Board&);
@@ -39,7 +44,14 @@ public:
 	 Board crossOver(Board, int); 
      void geneSwapMutate();
      void printGenome();
-	 void printBoard();     
+     int countBits(int);
+	 void printBoard();
+	 void smartMutate();
+	 int getNthSetBit(int, int);
+	 void someHitSwapMutate();
+	 int findHitsBitmask();
+	 void geneSwap(int pos1, int pos2);
+	 void hitsPermutationMutate();
 };
 
 #endif

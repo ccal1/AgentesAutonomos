@@ -23,6 +23,18 @@ int Board::getFit() {
     return this->fit;
 }
 
+double Board::exponentialFit() {
+    return 1.0/(1.0 + this->fit);
+}
+
+double Board::parabolicFit() {
+    return (((double)this->fit - MAX_ERROR)*(this->fit - MAX_ERROR))/(MAX_ERROR * MAX_ERROR);
+}
+
+double Board::linearFit() {
+    return ((double)this->fit - MAX_ERROR)/MAX_ERROR;
+}
+
 int Board::getGenome() {
     return this->genome;
 }
@@ -107,6 +119,12 @@ void Board::geneSwapMutate() {
     int pos1 = rand()%SIZE;
     int pos2 = (pos1 + rand()%(SIZE-1) + 1)%SIZE;
 
+    geneSwap(pos1, pos2);
+
+    calculateFit();
+}
+
+void Board::geneSwap(int pos1, int pos2) {
     int gene1 = get(pos1);
     int gene2 = get(pos2);
     
@@ -114,6 +132,86 @@ void Board::geneSwapMutate() {
     set_value(pos2, gene1);
 
     calculateFit();
+}
+
+void Board::hitsPermutationMutate() {
+    int hitsBitmask = findHitsBitmask();
+    vector<int> permutation;
+    for(int i = 0; i<SIZE; i++) {
+        if(hitsBitmask & (1<<i)) {
+            permutation.push_back(get(i));
+        }
+    }
+    random_shuffle(permutation.begin(), permutation.end());
+
+    int permutationPos = 0;
+    for(int i = 0; i<SIZE; i++) {
+        if(hitsBitmask & (1<<i)) {
+            set_value(i, permutation[permutationPos++]);
+        }
+    }
+
+    calculateFit();
+}
+
+int Board::countBits(int x) {
+    int bit = x & -x;
+    int count = 0;
+    while(bit) {
+        count++;
+        x^=bit;
+        bit = x & -x;
+    }
+    return count;
+}
+
+int Board::getNthSetBit(int mask, int count) {
+    int bit = mask & -mask;
+    while(--count) {
+        mask^=bit;
+        bit = mask & -mask;
+    }
+    return bit;
+}
+
+void Board::smartMutate() {
+    if(getFit() > 1) hitsPermutationMutate();
+    else someHitSwapMutate();
+}
+
+void Board::someHitSwapMutate() {
+    int hitsBitmask = findHitsBitmask();
+
+
+    if(hitsBitmask){
+        int setBits = countBits(hitsBitmask);
+        
+        int bitToSwap = rand() % setBits;
+
+        int pos1 = log2(getNthSetBit(hitsBitmask, bitToSwap));
+        int pos2 = (pos1 + rand()%(SIZE-1) + 1)%SIZE;
+
+        geneSwap(pos1, pos2);
+        calculateFit();
+    }
+
+
+    calculateFit();
+}
+
+int Board::findHitsBitmask() {
+    int hitsPos = 0;
+    for(int pos = 0; pos < SIZE; pos++)
+    {
+        for(int i = pos+1; i < SIZE; i++) {
+            int posDiff = i - pos;
+            if(posDiff == diff(pos, i)) {
+                hitsPos |= 1<<pos;
+                hitsPos |= 1<<i;
+            }
+        }
+    }
+    return hitsPos;
 }
 
 void Board::printGenome() {
