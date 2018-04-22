@@ -8,7 +8,7 @@
 #include "board.h"
 #include "timer.h"
 
-#define EXEC_NUMBER 40
+#define EXEC_NUMBER 100
 #define POPULATION_SIZE 100
 #define ITERATIONS 1000
 #define PARENTS_SIZE 2
@@ -39,6 +39,9 @@
 #define ALWAYS_REPLACE 2
 #define PARENTS_SUBSTITUTION BEST_SURVIVES
 
+// chances de mutacao e crosover em percentagem
+#define CROSSOVER_CHANCE 90
+#define MUTATION_CHANCE 40
 
 
 using namespace std;
@@ -350,11 +353,18 @@ Board* offspringGen(Board* parents, Board* offspring) {
     for(int j = 0; j < PARENTS_SIZE; j++) {
         
         for (int k = j+1; k < PARENTS_SIZE; k++) {
-            int pos = getCrossoverPos();
-            offspring[off_index++] = parents[j].crossOver(parents[k],pos);
+            if(rand() % 100 < CROSSOVER_CHANCE) {
+                int pos = getCrossoverPos();
+                offspring[off_index++] = parents[j].crossOver(parents[k],pos);
+                
+                pos = getCrossoverPos();
+                offspring[off_index++] = parents[k].crossOver(parents[j],pos);
+            }
+            else {
+                offspring[off_index++] = parents[j];
+                offspring[off_index++] = parents[k];
+            }
             
-            pos = getCrossoverPos();
-            offspring[off_index++] = parents[k].crossOver(parents[j],pos);
         }
 
     }
@@ -364,7 +374,7 @@ Board* offspringGen(Board* parents, Board* offspring) {
 
 Board* mutate(Board* offspring) {
     for (int i = 0; i < CHILDREN_SIZE; i++) {
-        if (rand() % 10 <= 3) {
+        if (rand() % 100 < MUTATION_CHANCE) {
             if(MUTATION == GENE_SWAP_MUTATE) offspring[i].geneSwapMutate();
             else if(MUTATION == SMART_MUTATE) offspring[i].smartMutate();
             else if(MUTATION == HIT_SWAP_MUTATE) offspring[i].someHitSwapMutate();
@@ -435,7 +445,6 @@ void printBoardVec(Board* Array, int sizeArray) {
 
 int getCrossoverPos() {
     int pos = rand() % (SIZE-1) + 1;
-    if (rand() % 10 == 9) pos = 0;
     return pos;
 }
 
