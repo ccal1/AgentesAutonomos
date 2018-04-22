@@ -188,7 +188,7 @@ statStruc geneticAlgorithm () {
         bestBoard.push_back(pop[0].getFit());
         timer.start();
 
-        if(pop[0].getFit() == 0 && !end)  {
+        if((pop[0].getFit() == 0 || i == (ITERATIONS-1))  && !end)  {
             timer.pause();
             timerEnd = timer;
             numInter = i;
