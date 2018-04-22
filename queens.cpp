@@ -11,14 +11,30 @@
 #define EXEC_NUMBER 40
 #define POPULATION_SIZE 100
 #define ITERATIONS 1000
-#define GROUP_SIZE 5
 #define PARENTS_SIZE 2
 #define CHILDREN_SIZE 2
 
+// parents selection choices
+#define BEST_OUT_OF_N 1
+#define ROULETTE 2
+#define PARENTS_SELECTION ROULETTE
+
+// for BEST_OUT_OF_N
+#define GROUP_SIZE 5
+
+// for roulette
+#define EXPONENTIAL_FIT 1
+#define PARABOLIC_FIT 2
+#define LINEAR_FIT 3
+#define FIT_TYPE EXPONENTIAL_FIT
+
+// mutation choices
 #define SMART_MUTATE 1
 #define GENE_SWAP_MUTATE 2
 #define HIT_SWAP_MUTATE 3
 #define MUTATION GENE_SWAP_MUTATE
+
+
 
 
 using namespace std;
@@ -43,6 +59,8 @@ struct resultsStruc {
     resultsStruc(pair<double,double> timerStat_, vector<pair<double,double> > resultStat_, vector<pair<double,double> > bestBoardStat_) : timerStat(timerStat_), resultStat(resultStat_), bestBoardStat(bestBoardStat_) {}
 };
 
+Board* getParentsRoulette(Board*, Board*, int*);
+double randomDouble(double);
 Board* getParents(Board*, int*, Board*, int*);
 int* getDistinct(int*, int);
 Board* replaceParentIfBetter(Board*, int*, Board, int);
@@ -130,7 +148,12 @@ statStruc geneticAlgorithm () {
 
         // Getting parents
         chosen = getDistinct(chosen, GROUP_SIZE);
-        parents = getParents(pop, chosen, parents, parentsIdx);
+        if(PARENTS_SELECTION == BEST_OUT_OF_N ) {
+            parents = getParents(pop, chosen, parents, parentsIdx);
+        }
+        else if(PARENTS_SELECTION == ROULETTE) {
+            parents = getParentsRoulette(pop, parents, parentsIdx);
+        }
         // timer.pause();
         // printBoardVec(parents, PARENTS_SIZE);
         // timer.start();
@@ -202,6 +225,46 @@ statStruc geneticAlgorithm () {
     delete[] offspring;
 
     return statStruc(timerEnd, statistics, bestBoard, numInter);
+}
+
+Board* getParentsRoulette(Board* pop, Board* parents, int* parentsIdx) {
+    double sumFit = 0;
+    for(int i = 0; i<POPULATION_SIZE;i++) {
+        if(FIT_TYPE == EXPONENTIAL_FIT) {
+            sumFit+=pop[i].exponentialFit();
+        }
+        else if(FIT_TYPE == PARABOLIC_FIT) {
+            sumFit+=pop[i].linearFit();
+        }
+        else if(FIT_TYPE == PARABOLIC_FIT) {
+            sumFit+=pop[i].linearFit();
+        }
+    }
+    vector<double> randomChoices;
+    for(int i = 0; i<PARENTS_SIZE; i++) {
+        randomChoices.push_back(randomDouble(sumFit));
+    }
+    sort(randomChoices.begin(), randomChoices.end());
+
+    int choicesIdx = 0;
+    sumFit = 0;
+    for(int i = 0; i<POPULATION_SIZE;i++) {
+        if(FIT_TYPE == EXPONENTIAL_FIT) {
+            sumFit+=pop[i].exponentialFit();
+        }
+        else if(FIT_TYPE == PARABOLIC_FIT) {
+            sumFit+=pop[i].linearFit();
+        }
+        else if(FIT_TYPE == PARABOLIC_FIT) {
+            sumFit+=pop[i].linearFit();
+        }
+        while(choicesIdx < randomChoices.size() && sumFit > randomChoices[choicesIdx]){
+            parentsIdx[choicesIdx] = i;
+            parents[choicesIdx] = pop[i];
+            choicesIdx++;
+        }
+    }
+    return parents;
 }
 
 Board* getParents(Board* pop, int* chosen, Board* parents, int* parentsIdx) {
@@ -409,4 +472,8 @@ resultsStruc generateResults (vector<statStruc> Results) {
     }
 
     return resultsStruc(timerStat, resultStat, bestBoardStat);
+}
+
+double randomDouble(double limit) {
+    return (limit * rand())/((double) RAND_MAX);
 }
