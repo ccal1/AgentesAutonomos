@@ -17,7 +17,7 @@
 // parents selection choices
 #define BEST_OUT_OF_N 1
 #define ROULETTE 2
-#define PARENTS_SELECTION ROULETTE
+#define PARENTS_SELECTION BEST_OUT_OF_N
 
 // for BEST_OUT_OF_N
 #define GROUP_SIZE 5
@@ -63,9 +63,9 @@ struct resultsStruc {
     resultsStruc(pair<double,double> timerStat_, vector<pair<double,double> > resultStat_, vector<pair<double,double> > bestBoardStat_) : timerStat(timerStat_), resultStat(resultStat_), bestBoardStat(bestBoardStat_) {}
 };
 
+Board* getParents(Board*, Board*, int*);
 Board* getParentsRoulette(Board*, Board*, int*);
-double randomDouble(double);
-Board* getParents(Board*, int*, Board*, int*);
+Board* getParentsBestOutOfN(Board*, Board* , int* );
 int* getDistinct(int*, int);
 Board* replaceParentIfBetter(Board*, int*, Board, int);
 Board* offspringGen(Board*, Board*);
@@ -80,6 +80,7 @@ bool finished(Board*, int*);
 pair<double, double> generateStatistics(Board*, int);
 statStruc geneticAlgorithm();
 resultsStruc generateResults (vector<statStruc>);
+double randomDouble(double);
 
 int main() {
     // Setting srand argument to generate random sequence
@@ -127,7 +128,6 @@ statStruc geneticAlgorithm () {
     srand (time(NULL));
     Timer timer = Timer(), timerEnd;
     Board *pop = new Board[POPULATION_SIZE];
-    int *chosen = new int[GROUP_SIZE];
     Board *parents = new Board[PARENTS_SIZE];
     int *parentsIdx = new int[PARENTS_SIZE];
     Board *offspring = new Board[CHILDREN_SIZE];
@@ -153,13 +153,7 @@ statStruc geneticAlgorithm () {
         //cout << "iteration: " << i+1 << endl; 
 
         // Getting parents
-        if(PARENTS_SELECTION == BEST_OUT_OF_N ) {
-            chosen = getDistinct(chosen, GROUP_SIZE);
-            parents = getParents(pop, chosen, parents, parentsIdx);
-        }
-        else if(PARENTS_SELECTION == ROULETTE) {
-            parents = getParentsRoulette(pop, parents, parentsIdx);
-        }
+        parents = getParents(pop, parents, parentsIdx);
         // timer.pause();
         // printBoardVec(parents, PARENTS_SIZE);
         // timer.start();
@@ -225,12 +219,20 @@ statStruc geneticAlgorithm () {
     // cout<<"\n";
 
     delete[] pop;
-    delete[] chosen;
     delete[] parents;
     delete[] parentsIdx;
     delete[] offspring;
 
     return statStruc(timerEnd, statistics, bestBoard, numInter);
+}
+
+Board* getParents(Board* pop, Board* parents, int* parentsIdx) {
+    if(PARENTS_SELECTION == BEST_OUT_OF_N ) {
+        parents = getParentsBestOutOfN(pop, parents, parentsIdx);
+    }
+    else if(PARENTS_SELECTION == ROULETTE) {
+        parents = getParentsRoulette(pop, parents, parentsIdx);
+    }
 }
 
 Board* getParentsRoulette(Board* pop, Board* parents, int* parentsIdx) {
@@ -273,7 +275,9 @@ Board* getParentsRoulette(Board* pop, Board* parents, int* parentsIdx) {
     return parents;
 }
 
-Board* getParents(Board* pop, int* chosen, Board* parents, int* parentsIdx) {
+Board* getParentsBestOutOfN(Board* pop, Board* parents, int* parentsIdx) {
+    int *chosen = new int[GROUP_SIZE];
+    chosen = getDistinct(chosen, GROUP_SIZE);
 
     if(pop[chosen[0]] < pop[chosen[1]]) {
         parentsIdx[0] = chosen[0];
@@ -290,6 +294,9 @@ Board* getParents(Board* pop, int* chosen, Board* parents, int* parentsIdx) {
     for(int i = 2; i < GROUP_SIZE; i++) {
         parents = replaceParentIfBetter(parents, parentsIdx, pop[chosen[i]], chosen[i]);
     }
+
+    delete[] chosen;
+
     return parents;
 }
 
