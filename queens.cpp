@@ -70,6 +70,8 @@ int* getDistinct(int*, int);
 Board* replaceParentIfBetter(Board*, int*, Board, int);
 Board* offspringGen(Board*, Board*);
 Board* mutate(Board*);
+Board* substituteParentsBestSurvives(Board*, Board*);
+Board* substituteParentsAlways(Board*, Board*);
 Board* substituteParents(Board*, Board*);
 void printBoardVec(Board*, int);
 Board* replaceParents(Board*, Board*, int*);
