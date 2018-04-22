@@ -15,6 +15,12 @@
 #define PARENTS_SIZE 2
 #define CHILDREN_SIZE 2
 
+#define SMART_MUTATE 1
+#define GENE_SWAP_MUTATE 2
+#define HIT_SWAP_MUTATE 3
+#define MUTATION GENE_SWAP_MUTATE
+
+
 using namespace std;
 
 struct statStruc {
@@ -283,7 +289,9 @@ Board* offspringGen(Board* parents, Board* offspring) {
 Board* mutate(Board* offspring) {
     for (int i = 0; i < CHILDREN_SIZE; i++) {
         if (rand() % 10 <= 3) {
-            offspring[i].geneSwapMutate();
+            if(MUTATION == GENE_SWAP_MUTATE) offspring[i].geneSwapMutate();
+            else if(MUTATION == SMART_MUTATE) offspring[i].smartMutate();
+            else if(MUTATION == HIT_SWAP_MUTATE) offspring[i].someHitSwapMutate();
         }
     }
     return offspring;
