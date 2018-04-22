@@ -39,6 +39,11 @@
 #define ALWAYS_REPLACE 2
 #define PARENTS_SUBSTITUTION BEST_SURVIVES
 
+// crossover choices
+#define CUT_AND_CROSSFILL 1
+#define CICLE_CROSSOVER 2
+#define CROSSOVER_METHOD CICLE_CROSSOVER
+
 // chances de mutacao e crosover em percentagem
 #define CROSSOVER_CHANCE 90
 #define MUTATION_CHANCE 40
@@ -354,11 +359,20 @@ Board* offspringGen(Board* parents, Board* offspring) {
         
         for (int k = j+1; k < PARENTS_SIZE; k++) {
             if(rand() % 100 < CROSSOVER_CHANCE) {
-                int pos = getCrossoverPos();
-                offspring[off_index++] = parents[j].crossOver(parents[k],pos);
                 
-                pos = getCrossoverPos();
-                offspring[off_index++] = parents[k].crossOver(parents[j],pos);
+
+                if(CROSSOVER_METHOD == CUT_AND_CROSSFILL) {
+                    int pos = getCrossoverPos();
+                    offspring[off_index++] = parents[j].crossOver(parents[k],pos);
+                    
+                    pos = getCrossoverPos();
+                    offspring[off_index++] = parents[k].crossOver(parents[j],pos);
+                }
+                else if(CROSSOVER_METHOD == CICLE_CROSSOVER) {
+                    pair<Board, Board> children = parents[j].cicleCrossOver(parents[k]);
+                    offspring[off_index++] = children.first;
+                    offspring[off_index++] = children.second;
+                }
             }
             else {
                 offspring[off_index++] = parents[j];

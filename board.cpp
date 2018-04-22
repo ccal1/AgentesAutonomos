@@ -108,6 +108,36 @@ Board Board::crossOver(Board other, int pos) {
     return Board(gene);
 }
 
+pair<Board, Board> Board::cicleCrossOver(Board other) {
+    int used = 0;
+    map<int, int> valuesMap;
+    for(int i = 0; i<SIZE; i++) {
+        valuesMap[get(i)] = i;
+    }
+    Board child1 = Board(0);
+    Board child2 = Board(0);
+    for(int i=0; i<SIZE; i++) {
+        int pos = i;
+        while(!(used& 1<<get(pos))) {
+            child1.setValue(pos, get(pos));
+            child2.setValue(pos, other.get(pos));
+
+            pos = valuesMap[other.get(pos)];
+            used |= 1<<get(i);   
+        }
+    }
+    int comb = 0;
+    int desired = 0;
+    for(int i = 0; i< SIZE; i++) {
+        comb |= 1<<child1.get(i);
+        desired |= 1<<i;
+    }
+    
+    child1.calculateFit();
+    child2.calculateFit();
+    return pair<Board, Board>(child1, child2);
+}
+
 void Board::geneSwapMutate() {
     int pos1 = rand()%SIZE;
     int pos2 = (pos1 + rand()%(SIZE-1) + 1)%SIZE;

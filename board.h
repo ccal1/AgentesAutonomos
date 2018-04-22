@@ -14,8 +14,10 @@ using namespace std;
 #include <math.h>
 #include <vector>
 #include <set>
+#include <map>
 #include <stdlib.h>
 #include <algorithm>
+#include <utility>
 
 class Board {
 private:
@@ -42,7 +44,8 @@ public:
 	bool operator < (const Board&); 
 	bool operator > (const Board&);
 	int get(int);
-	Board crossOver(Board, int); 
+	Board crossOver(Board, int);
+	pair<Board, Board> cicleCrossOver(Board);
 	void geneSwapMutate();
 	void printGenome();
 	void printBoard();
