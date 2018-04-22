@@ -47,14 +47,7 @@ bool Board::operator> (const Board& other) {
     return fit > other.fit;
 }
 
-
-void Board::permute(int x, int y) {
-    int temp = get(x);
-    set_value(x, get(y));
-    set_value(y, temp);
-}
-
-void Board::set_value(int pos, int value) {
+void Board::setValue(int pos, int value) {
     int bitPos = pos * BITS;
     int gene = clean(pos);
     gene |= value << bitPos;
@@ -128,8 +121,8 @@ void Board::geneSwap(int pos1, int pos2) {
     int gene1 = get(pos1);
     int gene2 = get(pos2);
     
-    set_value(pos1, gene2);
-    set_value(pos2, gene1);
+    setValue(pos1, gene2);
+    setValue(pos2, gene1);
 }
 
 void Board::hitsPermutationMutate() {
@@ -145,7 +138,7 @@ void Board::hitsPermutationMutate() {
     int permutationPos = 0;
     for(int i = 0; i<SIZE; i++) {
         if(hitsBitmask & (1<<i)) {
-            set_value(i, permutation[permutationPos++]);
+            setValue(i, permutation[permutationPos++]);
         }
     }
 
