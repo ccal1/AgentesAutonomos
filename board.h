@@ -21,7 +21,6 @@ class Board {
 private:
     int genome;
     int fit;
-    int hitsPos;
 	int getNthSetBit(int, int);
 
 public:
