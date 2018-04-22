@@ -32,8 +32,12 @@
 #define SMART_MUTATE 1
 #define GENE_SWAP_MUTATE 2
 #define HIT_SWAP_MUTATE 3
-#define MUTATION GENE_SWAP_MUTATE
+#define MUTATION SMART_MUTATE
 
+// substituicao de pais, selecao de sobreviventes
+#define BEST_SURVIVES 1
+#define ALWAYS_REPLACE 2
+#define PARENTS_SUBSTITUTION BEST_SURVIVES
 
 
 
@@ -147,8 +151,8 @@ statStruc geneticAlgorithm () {
         //cout << "iteration: " << i+1 << endl; 
 
         // Getting parents
-        chosen = getDistinct(chosen, GROUP_SIZE);
         if(PARENTS_SELECTION == BEST_OUT_OF_N ) {
+            chosen = getDistinct(chosen, GROUP_SIZE);
             parents = getParents(pop, chosen, parents, parentsIdx);
         }
         else if(PARENTS_SELECTION == ROULETTE) {
@@ -360,7 +364,7 @@ Board* mutate(Board* offspring) {
     return offspring;
 }
 
-Board* substituteParents(Board *parents, Board *offspring) {
+Board* substituteParentsBestSurvives(Board *parents, Board *offspring) {
     Board* Temp = new Board[PARENTS_SIZE];
     int par_index = 0, off_index = 0, temp_index = 0;
 
@@ -382,6 +386,22 @@ Board* substituteParents(Board *parents, Board *offspring) {
     delete[] parents;
 
     return Temp;
+}
+
+Board* substituteParentsAlways(Board *parents, Board *offspring) {
+    for(int i = 0; i<PARENTS_SIZE && i<CHILDREN_SIZE; i++) {
+        parents[i] = offspring[i];
+    }
+    return parents;
+}
+
+Board* substituteParents(Board *parents, Board *offspring) {
+    if(PARENTS_SUBSTITUTION == BEST_SURVIVES) {
+        return substituteParentsBestSurvives(parents, offspring);
+    }
+    else if(PARENTS_SUBSTITUTION == ALWAYS_REPLACE) {
+        return substituteParentsAlways(parents, offspring);
+    }
 }
 
 Board* replaceParents(Board* pop, Board *parents, int* parentsIdx) {
