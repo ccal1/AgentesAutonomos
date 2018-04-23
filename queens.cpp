@@ -8,16 +8,16 @@
 #include "board.h"
 #include "timer.h"
 
-#define EXEC_NUMBER 100
+#define EXEC_NUMBER 30
 #define POPULATION_SIZE 100
-#define ITERATIONS 1000
+#define ITERATIONS 10000
 #define PARENTS_SIZE 2
 #define CHILDREN_SIZE 2
 
 // parents selection choices
 #define BEST_OUT_OF_N 1
 #define ROULETTE 2
-#define PARENTS_SELECTION BEST_OUT_OF_N
+#define PARENTS_SELECTION ROULETTE
 
 // for BEST_OUT_OF_N
 #define GROUP_SIZE 5
@@ -64,11 +64,12 @@ struct statStruc {
 
 struct resultsStruc {
     pair<double,double> timerStat;
+    pair<double,double> iterStat;
     vector<pair<double,double> > resultStat;
     vector<pair<double,double> > bestBoardStat;
 
     resultsStruc() {}
-    resultsStruc(pair<double,double> timerStat_, vector<pair<double,double> > resultStat_, vector<pair<double,double> > bestBoardStat_) : timerStat(timerStat_), resultStat(resultStat_), bestBoardStat(bestBoardStat_) {}
+    resultsStruc(pair<double,double> timerStat_, vector<pair<double,double> > resultStat_, vector<pair<double,double> > bestBoardStat_, pair<double,double> iterStat_) : timerStat(timerStat_), resultStat(resultStat_), bestBoardStat(bestBoardStat_), iterStat(iterStat_) {}
 };
 
 Board* getParents(Board*, Board*, int*);
@@ -94,6 +95,7 @@ int main() {
     // Setting srand argument to generate random sequence
     vector<statStruc> Results(EXEC_NUMBER);
     resultsStruc finalResults;
+    srand(time(NULL));
 
     for (unsigned int i = 0; i < Results.size(); i++) {
         Results[i] = geneticAlgorithm();
@@ -127,13 +129,21 @@ int main() {
     }
     cout<<"\n";
 
+    cout<<"Iteration number by Execution: \n";
+    for (unsigned int i = 0; i < Results.size(); i++) {
+        cout << Results[i].numInter << " ";
+    }
+    cout << endl;
+
+    cout << "Iteration Average: " << finalResults.iterStat.first << endl;
+    cout << "Iteration Standard Deviation: " << finalResults.iterStat.second << endl;
+
     Results.clear();
 
     return 0;
 }
 
 statStruc geneticAlgorithm () {
-    srand (time(NULL));
     Timer timer = Timer(), timerEnd;
     Board *pop = new Board[POPULATION_SIZE];
     Board *parents = new Board[PARENTS_SIZE];
@@ -143,7 +153,6 @@ statStruc geneticAlgorithm () {
     vector<int> bestBoard;
     bool end = false;
     int numInter = 0;
-
 
     // Generating initial Population
     for(int i = 0; i<POPULATION_SIZE; i++) {
@@ -482,18 +491,25 @@ resultsStruc generateResults (vector<statStruc> Results) {
     pair<double,double> timerStat(0,0);
     vector<pair<double,double> > resultStat(ITERATIONS,pair<double,double>(0,0));
     vector<pair<double,double> > bestBoardStat(ITERATIONS,pair<double,double>(0,0));
+    pair<double,double> iterStat(0,0);
 
-    // Calculations for Timer
+    // Calculations for Timer and Iterations
     for (unsigned int i = 0; i < Results.size(); i++) {
         timerStat.first += Results[i].timer.getNanoseconds();
+        iterStat.first += Results[i].numInter;
     }
     timerStat.first = timerStat.first/Results.size();
+    iterStat.first = iterStat.first/Results.size();
 
     for(unsigned int i = 0; i < Results.size(); i++) {
         double delta = timerStat.first - Results[i].timer.getNanoseconds();
         timerStat.second += sqrt(delta * delta);
+
+        delta = iterStat.first - Results[i].numInter;
+        iterStat.second += sqrt(delta * delta);
     }
     timerStat.second = timerStat.second/Results.size();
+    iterStat.second = iterStat.second/Results.size();
 
     // Calculations for statistics
     for (int i = 0; i < ITERATIONS; i++) {
@@ -523,7 +539,7 @@ resultsStruc generateResults (vector<statStruc> Results) {
         bestBoardStat[i].second = bestBoardStat[i].second/Results.size();
     }
 
-    return resultsStruc(timerStat, resultStat, bestBoardStat);
+    return resultsStruc(timerStat, resultStat, bestBoardStat, iterStat);
 }
 
 double randomDouble(double limit) {
