@@ -196,7 +196,7 @@ int Board::getNthSetBit(int mask, int count) {
 }
 
 void Board::smartMutate() {
-    if(getFit() > 1) hitsPermutationMutate();
+    if(getFit() > 3) hitsPermutationMutate();
     else someHitSwapMutate();
 }
 
