@@ -243,3 +243,15 @@ void Board::printBoard() {
     cout << getFit() << endl;
     printGenome();
 }
+
+void Board::prettyPrint(){
+    for (int i = 0; i < SIZE; i++) {
+        for(int j = 0; j<SIZE; j++) {
+            if(j==get(i)) cout<<"O";
+            else if((j+i)&1) cout<<"_";
+            else cout<<"X";
+        }
+        cout << endl;
+    }
+    cout << endl;
+}
