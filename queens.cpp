@@ -8,16 +8,16 @@
 #include "board.h"
 #include "timer.h"
 
-#define EXEC_NUMBER 30
+#define EXEC_NUMBER 100
 #define POPULATION_SIZE 100
-#define ITERATIONS 10000
+#define ITERATIONS 1000
 #define PARENTS_SIZE 2
 #define CHILDREN_SIZE 2
 
 // parents selection choices
 #define BEST_OUT_OF_N 1
 #define ROULETTE 2
-#define PARENTS_SELECTION ROULETTE
+#define PARENTS_SELECTION BEST_OUT_OF_N
 
 // for BEST_OUT_OF_N
 #define GROUP_SIZE 5
@@ -42,10 +42,10 @@
 // crossover choices
 #define CUT_AND_CROSSFILL 1
 #define CICLE_CROSSOVER 2
-#define CROSSOVER_METHOD CICLE_CROSSOVER
+#define CROSSOVER_METHOD CUT_AND_CROSSFILL
 
 // chances de mutacao e crosover em percentagem
-#define CROSSOVER_CHANCE 90
+#define CROSSOVER_CHANCE 60
 #define MUTATION_CHANCE 40
 
 
@@ -106,28 +106,32 @@ int main() {
     cout<<"Time Average: "<<finalResults.timerStat.first<<"\n";
     cout<<"Time Standard Deviation: "<<finalResults.timerStat.second<<"\n";
     cout<<"\nAverage:\n";
+    cout<<"[";
     for(unsigned int i = 0; i<finalResults.resultStat.size(); i++){
-        cout<<finalResults.resultStat[i].first<< " ";
+        cout<<finalResults.resultStat[i].first<< ", ";
     }
-    cout<<"\n\n";
+    cout<<"]\n\n";
     
     cout<<"Standard Deviation:\n";
+    cout<<"[";
     for(unsigned int i = 0; i<finalResults.resultStat.size(); i++){
-        cout<< finalResults.resultStat[i].second << " ";
+        cout<< finalResults.resultStat[i].second << ", ";
     }
-    cout<<"\n\n";
+    cout<<"]\n\n";
     
     cout<<"Best by iteration Average: \n";
+    cout<<"[";
     for(unsigned int i = 0; i < finalResults.bestBoardStat.size(); i++){
-        cout<< finalResults.bestBoardStat[i].first << " ";
+        cout<< finalResults.bestBoardStat[i].first << ", ";
     }
-    cout<<"\n";
+    cout<<"]\n";
 
     cout<<"Best by iteration Standard Deviation: \n";
+    cout<<"[";
     for(unsigned int i = 0; i < finalResults.bestBoardStat.size(); i++){
-        cout<< finalResults.bestBoardStat[i].second << " ";
+        cout<< finalResults.bestBoardStat[i].second << ", ";
     }
-    cout<<"\n";
+    cout<<"]\n";
 
     cout<<"Iteration number by Execution: \n";
     for (unsigned int i = 0; i < Results.size(); i++) {
