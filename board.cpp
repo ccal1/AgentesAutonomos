@@ -116,21 +116,23 @@ pair<Board, Board> Board::cicleCrossOver(Board other) {
     }
     Board child1 = Board(0);
     Board child2 = Board(0);
+    int invert = 0;
     for(int i=0; i<SIZE; i++) {
         int pos = i;
-        while(!(used& 1<<get(pos))) {
-            child1.setValue(pos, get(pos));
-            child2.setValue(pos, other.get(pos));
-
+        if(!(used& (1<<pos))) invert = !invert;
+        while(!(used& (1<<pos))) {
+            if(invert) {
+                child1.setValue(pos, get(pos));
+                child2.setValue(pos, other.get(pos));
+            }
+            else {
+                child2.setValue(pos, get(pos));
+                child1.setValue(pos, other.get(pos));
+            }
+            
+            used |= 1<<pos;
             pos = valuesMap[other.get(pos)];
-            used |= 1<<get(i);   
         }
-    }
-    int comb = 0;
-    int desired = 0;
-    for(int i = 0; i< SIZE; i++) {
-        comb |= 1<<child1.get(i);
-        desired |= 1<<i;
     }
     
     child1.calculateFit();
@@ -196,7 +198,7 @@ int Board::getNthSetBit(int mask, int count) {
 }
 
 void Board::smartMutate() {
-    if(getFit() > 3) hitsPermutationMutate();
+    if(getFit() > 4) hitsPermutationMutate();
     else someHitSwapMutate();
 }
 
