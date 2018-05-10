@@ -8,16 +8,16 @@
 #include "board.h"
 #include "timer.h"
 
-#define EXEC_NUMBER 30
+#define EXEC_NUMBER 1000
 #define POPULATION_SIZE 100
-#define ITERATIONS 10000
+#define ITERATIONS 1000
 #define PARENTS_SIZE 2
 #define CHILDREN_SIZE 2
 
 // parents selection choices
 #define BEST_OUT_OF_N 1
 #define ROULETTE 2
-#define PARENTS_SELECTION ROULETTE
+#define PARENTS_SELECTION BEST_OUT_OF_N
 
 // for BEST_OUT_OF_N
 #define GROUP_SIZE 5
@@ -32,7 +32,7 @@
 #define SMART_MUTATE 1
 #define GENE_SWAP_MUTATE 2
 #define HIT_SWAP_MUTATE 3
-#define MUTATION SMART_MUTATE
+#define MUTATION GENE_SWAP_MUTATE
 
 // substituicao de pais, selecao de sobreviventes
 #define BEST_SURVIVES 1
@@ -42,7 +42,7 @@
 // crossover choices
 #define CUT_AND_CROSSFILL 1
 #define CICLE_CROSSOVER 2
-#define CROSSOVER_METHOD CICLE_CROSSOVER
+#define CROSSOVER_METHOD CUT_AND_CROSSFILL
 
 // chances de mutacao e crosover em percentagem
 #define CROSSOVER_CHANCE 90
@@ -105,35 +105,35 @@ int main() {
 
     cout<<"Time Average: "<<finalResults.timerStat.first<<"\n";
     cout<<"Time Standard Deviation: "<<finalResults.timerStat.second<<"\n";
-    cout<<"\nAverage:\n";
+    cout<<"\nAverage:\n[";
     for(unsigned int i = 0; i<finalResults.resultStat.size(); i++){
-        cout<<finalResults.resultStat[i].first<< " ";
+        cout<<finalResults.resultStat[i].first<< ", ";
     }
-    cout<<"\n\n";
+    cout<<"]\n\n";
     
-    cout<<"Standard Deviation:\n";
+    cout<<"Standard Deviation:\n[";
     for(unsigned int i = 0; i<finalResults.resultStat.size(); i++){
-        cout<< finalResults.resultStat[i].second << " ";
+        cout<< finalResults.resultStat[i].second << ", ";
     }
-    cout<<"\n\n";
+    cout<<"]\n\n";
     
-    cout<<"Best by iteration Average: \n";
+    cout<<"Best by iteration Average: \n[";
     for(unsigned int i = 0; i < finalResults.bestBoardStat.size(); i++){
-        cout<< finalResults.bestBoardStat[i].first << " ";
+        cout<< finalResults.bestBoardStat[i].first << ", ";
     }
-    cout<<"\n";
+    cout<<"]\n";
 
-    cout<<"Best by iteration Standard Deviation: \n";
+    cout<<"Best by iteration Standard Deviation: \n[";
     for(unsigned int i = 0; i < finalResults.bestBoardStat.size(); i++){
-        cout<< finalResults.bestBoardStat[i].second << " ";
+        cout<< finalResults.bestBoardStat[i].second << ", ";
     }
-    cout<<"\n";
+    cout<<"]\n";
 
-    cout<<"Iteration number by Execution: \n";
+    cout<<"Iteration number by Execution: \n[";
     for (unsigned int i = 0; i < Results.size(); i++) {
-        cout << Results[i].numInter << " ";
+        cout << Results[i].numInter << ", ";
     }
-    cout << endl;
+    cout << "]\n";
 
     cout << "Iteration Average: " << finalResults.iterStat.first << endl;
     cout << "Iteration Standard Deviation: " << finalResults.iterStat.second << endl;
