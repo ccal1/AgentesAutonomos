@@ -259,9 +259,9 @@ Board* getParentsRoulette(Board* pop, Board* parents, int* parentsIdx) {
             sumFit+=pop[i].exponentialFit();
         }
         else if(FIT_TYPE == PARABOLIC_FIT) {
-            sumFit+=pop[i].linearFit();
+            sumFit+=pop[i].parabolicFit();
         }
-        else if(FIT_TYPE == PARABOLIC_FIT) {
+        else if(FIT_TYPE == LINEAR_FIT) {
             sumFit+=pop[i].linearFit();
         }
     }
@@ -278,9 +278,9 @@ Board* getParentsRoulette(Board* pop, Board* parents, int* parentsIdx) {
             sumFit+=pop[i].exponentialFit();
         }
         else if(FIT_TYPE == PARABOLIC_FIT) {
-            sumFit+=pop[i].linearFit();
+            sumFit+=pop[i].parabolicFit();
         }
-        else if(FIT_TYPE == PARABOLIC_FIT) {
+        else if(FIT_TYPE == LINEAR_FIT) {
             sumFit+=pop[i].linearFit();
         }
         while(choicesIdx < randomChoices.size() && sumFit > randomChoices[choicesIdx]){

@@ -49,6 +49,7 @@ public:
 	void geneSwapMutate();
 	void printGenome();
 	void printBoard();
+	void prettyPrint();
 	void smartMutate();
 	void someHitSwapMutate();
 	int findHitsBitmask();
