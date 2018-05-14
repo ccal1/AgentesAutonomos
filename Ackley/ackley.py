@@ -5,6 +5,7 @@ from evolutive_strategys import EE2c
 from evolutive_strategys import EE3
 from evolutive_strategys import EE3c
 from evolutive_strategys import EE3xXablau
+import matplotlib.pyplot as plt
 import evolutive_strategys
 import time
 
@@ -23,24 +24,44 @@ def lesser_EE(x, y):
 
 
 def main():
-    #number_it_list = []
-    #for i in range(30):
-        # for i in range(POP_SIZE):
-        #     pop_i = evolve_pop(100)
-        #     print_pop(pop_i, str(i), "xablau")
-        #     pop_i[0].reset_sigma()
-        #     pop.append(pop_i[0])
+    number_it_list = []
+    means = []
+    for i in range(5):
+        #for i in range(POP_SIZE):
+        #    pop_i = evolve_pop(100)
+        #    print_pop(pop_i[0], str(i), "xablau")
+        #    pop_i[0][0].reset_sigma()
+        #    pop_i[0].append(pop_i[0][0])
 
-        # pop.sort(key=comp_EE)
-        # print_pop_cromossom(pop, "xit", "xat")
-        #
-        # print_pop(pop, "xit", "xat")
-        # evolve_pop(10000, pop)
-        # print_pop(pop, "end", "end")
+        #pop_i[0].sort(key=comp_EE)
+        #print_pop_cromossom(pop_i[0], "xit", "xat")
+        #print_pop(pop_i[0], "xit", "xat")
+        #evolve_pop(10000, pop_i[0])
+        #print_pop(pop_i[0], "end", "end")
         pop = []
-        pop, number_it = evolve_pop(10000)
-        #number_it_list.append(number_it)
+        pop, number_it ,stds= evolve_pop(10000)
+        number_it_list.append(number_it)
+        means.append(stds)
         print_pop(pop, "end", "end")
+    #plotting Number Iterations till converge
+    number_it_list = np.array(number_it_list)
+    number_it_mean = np.mean(number_it_list)
+    print(number_it_mean)
+    #plotting Means by iteration
+    values = []
+    medias = []
+    desvios = []
+    for i in range(means):
+        for j in range(means):
+            values.append(stds[j][i])
+        values = np.array(values)
+        medias.append(np.mean(values))
+        desvios.append(np.variance(values))
+        values = []
+    
+
+
+
 
 
 
@@ -102,6 +123,7 @@ def evolve_pop(iterations, pop=generate_pop()):
     evolutive_strategys.time_seed()
     parents_size = 6
     number_it = -1
+    means = []
     for i in range(iterations):
         parents_index = np.random.randint(POP_SIZE, size=parents_size)
         parents_index.sort()
@@ -129,10 +151,13 @@ def evolve_pop(iterations, pop=generate_pop()):
                 offspring_idx += 1
 
         pop.sort(key=comp_EE)
-
+        mean_fitness = calculate_mean_fitness(pop)
+        means.append(mean_fitness)
         if (pop[0].fitness < 0.1 and number_it == -1):
             number_it = i
-    return pop, number_it
+    if number_it == -1:
+        number_it = 10000
+    return pop, number_it, means
 
 
 def reduce(parents_index):
