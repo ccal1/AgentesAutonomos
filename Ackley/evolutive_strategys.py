@@ -285,7 +285,7 @@ class EE3c:
 
     def iterate(self):
         child = self.calc_mutation()
-
+        
         self.replace_with(child)
 
         self.it_number += 1

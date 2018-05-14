@@ -23,26 +23,31 @@ def lesser_EE(x, y):
 
 
 def main():
-    pop = []
-    # for i in range(POP_SIZE):
-    #     pop_i = evolve_pop(100)
-    #     print_pop(pop_i, str(i), "xablau")
-    #     pop_i[0].reset_sigma()
-    #     pop.append(pop_i[0])
+    #number_it_list = []
+    #for i in range(30):
+        # for i in range(POP_SIZE):
+        #     pop_i = evolve_pop(100)
+        #     print_pop(pop_i, str(i), "xablau")
+        #     pop_i[0].reset_sigma()
+        #     pop.append(pop_i[0])
 
-    # pop.sort(key=comp_EE)
-    # print_pop_cromossom(pop, "xit", "xat")
-    #
-    # print_pop(pop, "xit", "xat")
-    # evolve_pop(10000, pop)
-    # print_pop(pop, "end", "end")
-    pop = evolve_pop(10000)
-    print_pop(pop, "end", "end")
+        # pop.sort(key=comp_EE)
+        # print_pop_cromossom(pop, "xit", "xat")
+        #
+        # print_pop(pop, "xit", "xat")
+        # evolve_pop(10000, pop)
+        # print_pop(pop, "end", "end")
+        pop = []
+        pop, number_it = evolve_pop(10000)
+        #number_it_list.append(number_it)
+        print_pop(pop, "end", "end")
+
+
 
 def generate_pop():
     pop = []
     for i in range(POP_SIZE):
-        pop.append(EE3c(30 * np.random.rand(30) - 15, np.random.rand(30)))
+        pop.append(EE3c(30 * np.random.rand(30) - 15, np.random.random(30)))
     pop.sort(key=comp_EE)
     return pop
 
@@ -96,6 +101,7 @@ def roulette(pop, parents_size):
 def evolve_pop(iterations, pop=generate_pop()):
     evolutive_strategys.time_seed()
     parents_size = 6
+    number_it = -1
     for i in range(iterations):
         parents_index = np.random.randint(POP_SIZE, size=parents_size)
         parents_index.sort()
@@ -123,7 +129,10 @@ def evolve_pop(iterations, pop=generate_pop()):
                 offspring_idx += 1
 
         pop.sort(key=comp_EE)
-    return pop
+
+        if (pop[0].fitness < 0.1 and number_it == -1):
+            number_it = i
+    return pop, number_it
 
 
 def reduce(parents_index):
@@ -135,6 +144,39 @@ def reduce(parents_index):
             idx += 1
     return parents_index2
 
+def calculate_mean(lis):
+    mean = 0
+    amount = len(lis)
+    for i in lis:
+        mean += i
+    return mean/amount
+
+def calculate_std_dev(lis):
+    mean = calculate_mean_fitness(lis)
+    amount = len(lis)
+    std_dev = 0
+    for i in pop:
+        std_dev += (i - mean)**2
+    std_dev /= amount
+    std_dev = np.sqrt(std_dev)
+    return std_dev
+
+def calculate_mean_fitness(pop):
+    fit_mean = 0
+    amount = len(pop)
+    for i in pop:
+        fit_mean += i.fitness
+    return fit_mean/amount
+
+def calculate_std_deviation_fitness(pop):
+    fit_mean = calculate_mean_fitness(pop)
+    amount = len(pop)
+    std_dev = 0
+    for i in pop:
+        std_dev += (i.fitness - fit_mean)**2
+    std_dev /= amount
+    std_dev = np.sqrt(std_dev)
+    return std_dev
 
 if __name__ == "__main__":
     main()
