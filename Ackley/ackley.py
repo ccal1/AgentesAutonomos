@@ -11,7 +11,7 @@ import time
 
 #Constants
 POP_SIZE = 30
-N = 5
+N = 20
 ITERATIONS = 10000
 
 def comp_EE(x):
@@ -49,7 +49,7 @@ def main():
     #printing Number Iterations till converge
     number_it_list = np.array(number_it_list)
     number_it_mean = np.mean(number_it_list)
-    print("mean of iterations to converge(<= 0.1" + number_it_mean)
+    print("mean of iterations to converge" + number_it_mean)
     #plotting Means by iteration
     plot_mean_through_iterations(means, "EE3c")
 
@@ -70,7 +70,7 @@ def plot_mean_through_iterations(means, algorithm):
     ax.errorbar(x, medias, yerr=desvios)
     ax.set_ylabel('Average(+ standard deviation)')
     ax.set_xlabel('Iterations(Max = 10000)')
-    ax.set_title('Average through ' + N + ' iterations with ' + algorithm)
+    ax.set_title('Population average through ' + N + ' iterations with ' + algorithm)
     plt.show()
 
 
