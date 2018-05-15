@@ -12,7 +12,7 @@ import time
 #Constants
 POP_SIZE = 30
 N = 5
-ITERATIONS = 10000
+ITERATIONS = 1000
 
 def comp_EE(x):
     return x.fitness
@@ -28,6 +28,7 @@ def lesser_EE(x, y):
 def main():
     number_it_list = []
     means = []
+    bests = []
     for i in range(N):
         #for i in range(POP_SIZE):
         #    pop_i = evolve_pop(100)
@@ -40,21 +41,22 @@ def main():
         #print_pop(pop_i[0], "xit", "xat")
         #evolve_pop(10000, pop_i[0])
         #print_pop(pop_i[0], "end", "end")
-        pop = []
-        pop, number_it ,stds= evolve_pop(10000)
+        pop, number_it, stds, bests_i = evolve_pop(ITERATIONS)
         number_it_list.append(number_it)
         means.append(stds)
+        bests.append(bests_i)
         print(len(stds))
         print_pop(pop, "end", "end")
     #printing Number Iterations till converge
     number_it_list = np.array(number_it_list)
     number_it_mean = np.mean(number_it_list)
-    print("mean of iterations to converge(<= 0.1" + number_it_mean)
+    print("mean of iterations to converge(<= 0.1" + str(number_it_mean))
     #plotting Means by iteration
-    plot_mean_through_iterations(means, "EE3c")
+    plot_iterations(means, "EE3c", "Average")
+    plot_iterations(bests, "EE3c", "Bests")
 
 
-def plot_mean_through_iterations(means, algorithm):
+def plot_iterations(means, algorithm, title):
     values = []
     medias = []
     desvios = []
@@ -65,12 +67,12 @@ def plot_mean_through_iterations(means, algorithm):
         medias.append(np.mean(values))
         desvios.append(np.std(values))
         values = []
-    x = np.arange(0,len(medias))
+    x = np.arange(0, len(medias))
     fig, ax = plt.subplots()
     ax.errorbar(x, medias, yerr=desvios)
-    ax.set_ylabel('Average(+ standard deviation)')
+    ax.set_ylabel(title+'(+ standard deviation)')
     ax.set_xlabel('Iterations(Max = 10000)')
-    ax.set_title('Average through ' + N + ' iterations with ' + algorithm)
+    ax.set_title(title+' through ' + str(N) + ' iterations with ' + algorithm)
     plt.show()
 
 
@@ -98,7 +100,7 @@ def print_pop(pop, message_before, message_after):
     print(message_before + ":\n")
 
     for i in pop:
-        print(i.get_fitness())
+        print(i.fitness)
         # print(i.get_sigma())
         # print(i.get_cromossom())
 
@@ -134,40 +136,45 @@ def evolve_pop(iterations, pop=generate_pop()):
     parents_size = 6
     number_it = -1
     means = []
+    bests = []
     for i in range(iterations):
         parents_index = np.random.randint(POP_SIZE, size=parents_size)
         parents_index.sort()
 
         offspring = []
 
-        for j in range(parents_size):
-            parent1 = pop[parents_index[j]]
-            for k in range(j + 1, parents_size):
-                parent2 = pop[parents_index[k]]
-                offspring.append(parent1.crossover_random(parent2))
+        if POP_SIZE == 1:
+            pop[0].iterate()
+        else:
+            for j in range(parents_size):
+                parent1 = pop[parents_index[j]]
+                for k in range(j + 1, parents_size):
+                    parent2 = pop[parents_index[k]]
+                    offspring.append(parent1.crossover_random(parent2))
 
-        for j in offspring:
-            for k in range(1):
-                j.iterate()
+            for j in offspring:
+                for k in range(1):
+                    j.iterate()
 
-        offspring.sort(key=comp_EE)
+            offspring.sort(key=comp_EE)
 
-        parents_index = reduce(parents_index)
+            parents_index = reduce(parents_index)
 
-        offspring_idx = 0
-        for parent_idx in range(len(parents_index)):
-            if lesser_EE(offspring[offspring_idx], pop[parents_index[parent_idx]]):
-                pop[parents_index[parent_idx]] = offspring[offspring_idx]
-                offspring_idx += 1
+            offspring_idx = 0
+            for parent_idx in range(len(parents_index)):
+                if lesser_EE(offspring[offspring_idx], pop[parents_index[parent_idx]]):
+                    pop[parents_index[parent_idx]] = offspring[offspring_idx]
+                    offspring_idx += 1
 
         pop.sort(key=comp_EE)
         mean_fitness = calculate_mean_fitness(pop)
         means.append(mean_fitness)
+        bests.append(pop[0].fitness)
         if (pop[0].fitness < 0.1 and number_it == -1):
             number_it = i
     if number_it == -1:
-        number_it = 10000
-    return pop, number_it, means
+        number_it = ITERATIONS
+    return pop, number_it, means, bests
 
 
 def reduce(parents_index):

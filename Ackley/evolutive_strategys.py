@@ -227,8 +227,6 @@ class EE3:
         child = self.calc_mutation()
         if child.fitness <= self.fitness:
             self.replace_with(child)
-        else:
-            self.sigma = child.sigma
         # if self.it_number %100 ==0:
         #     self.sigma = np.random.random()
         
@@ -290,7 +288,7 @@ class EE3c:
 
         self.it_number += 1
         if (not (self.it_number % 10)):
-            self.threshold /= 2.0
+            self.threshold /= 1.1
 
     def crossover_complete(self, other):
         alpha = 0.5
