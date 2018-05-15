@@ -80,7 +80,7 @@ def plot_iterations(means, algorithm, title):
 def generate_pop():
     pop = []
     for i in range(POP_SIZE):
-        pop.append(EE3c(30 * np.random.rand(30) - 15, np.random.random(30)))
+        pop.append(EE2c(30 * np.random.rand(30) - 15, np.random.random()))
     pop.sort(key=comp_EE)
     return pop
 

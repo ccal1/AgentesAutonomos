@@ -150,6 +150,9 @@ class EE2c:
         tal = 1 / np.sqrt(30)
         newSigma = self.sigma * np.exp(tal * np.random.randn())
 
+        # print(self.sigma)
+        # print(newSigma)
+        # print(self.threshold)
         if self.threshold > newSigma:
             newSigma = self.threshold
 
@@ -159,11 +162,7 @@ class EE2c:
         newSigma = self.calc_sigma()
         cromossomTemp = self.cromossom + newSigma * np.random.randn(30)
 
-        newMember = EE2c()
-        newMember.set_cromossom(cromossomTemp)
-        newMember.set_sigma(newSigma)
-        newMember.set_fitness()
-
+        newMember = EE2c(cromossomTemp, newSigma)
         return newMember
 
     def replace_with(self, child):
@@ -175,8 +174,6 @@ class EE2c:
         child = self.calc_mutation()
         if child.fitness <= self.fitness:
             self.replace_with(child)
-        else:
-            self.sigma = child.sigma
 
         self.it_number += 1
 
