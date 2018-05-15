@@ -206,7 +206,7 @@ class EE3:
         self.threshold = 0.5
 
     def calc_sigma(self):
-        new_sigma = self.sigma * np.exp(self.t * np.random.randn(30) + self.tl * np.random.randn(30))
+        new_sigma = self.sigma * np.exp(self.t * np.random.randn() + self.tl * np.random.randn(30))
         return np.maximum(new_sigma, self.threshold + np.zeros(30))
 
     def replace_with(self, child):
@@ -264,7 +264,7 @@ class EE3c:
         self.sigma = np.random.random(30)
 
     def calc_sigma(self):
-        new_sigma = self.sigma * np.exp(self.t * np.random.randn() * np.random.randn() + self.tl * np.random.randn())
+        new_sigma = self.sigma * np.exp(self.t * np.random.randn(30) + self.tl * np.random.randn())
         return np.maximum(new_sigma, self.threshold + np.zeros(30))
 
     def replace_with(self, child):
