@@ -9,8 +9,10 @@ import matplotlib.pyplot as plt
 import evolutive_strategys
 import time
 
+#Constants
 POP_SIZE = 30
-
+N = 5
+ITERATIONS = 10000
 
 def comp_EE(x):
     return x.fitness
@@ -26,7 +28,7 @@ def lesser_EE(x, y):
 def main():
     number_it_list = []
     means = []
-    for i in range(5):
+    for i in range(N):
         #for i in range(POP_SIZE):
         #    pop_i = evolve_pop(100)
         #    print_pop(pop_i[0], str(i), "xablau")
@@ -42,26 +44,34 @@ def main():
         pop, number_it ,stds= evolve_pop(10000)
         number_it_list.append(number_it)
         means.append(stds)
+        print(len(stds))
         print_pop(pop, "end", "end")
-    #plotting Number Iterations till converge
+    #printing Number Iterations till converge
     number_it_list = np.array(number_it_list)
     number_it_mean = np.mean(number_it_list)
-    print(number_it_mean)
+    print("mean of iterations to converge(<= 0.1" + number_it_mean)
     #plotting Means by iteration
+    plot_mean_through_iterations(means, "EE3c")
+
+
+def plot_mean_through_iterations(means, algorithm):
     values = []
     medias = []
     desvios = []
-    for i in range(means):
-        for j in range(means):
-            values.append(stds[j][i])
+    for i in range(0,ITERATIONS):
+        for j in range(0,N):
+            values.append(means[j][i])
         values = np.array(values)
         medias.append(np.mean(values))
-        desvios.append(np.variance(values))
+        desvios.append(np.std(values))
         values = []
-    
-
-
-
+    x = np.arange(0,len(medias))
+    fig, ax = plt.subplots()
+    ax.errorbar(x, medias, yerr=desvios)
+    ax.set_ylabel('Average(+ standard deviation)')
+    ax.set_xlabel('Iterations(Max = 10000)')
+    ax.set_title('Average through ' + N + ' iterations with ' + algorithm)
+    plt.show()
 
 
 
