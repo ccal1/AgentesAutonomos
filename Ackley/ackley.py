@@ -52,8 +52,8 @@ def main():
     number_it_mean = np.mean(number_it_list)
     print("mean of iterations to converge" + str(number_it_mean))
     #plotting Means by iteration
-    plot_iterations_dots(means, "EE2c", "Average")
-    plot_iterations_dots(bests, "EE2c", "Bests")
+    plot_iterations_dots(means, "EE3c", "Average")
+    plot_iterations_dots(bests, "EE3c", "Bests")
     plot_both(means,bests, "EE2c", "Average and Best")
 
 
@@ -119,7 +119,7 @@ def plot_both(means, best, algorithm, title):
 def generate_pop():
     pop = []
     for i in range(POP_SIZE):
-        pop.append(EE2c(30 * np.random.rand(30) - 15, np.random.random()))
+        pop.append(EE3c(30 * np.random.rand(30) - 15, np.random.random(30)))
     pop.sort(key=comp_EE)
     return pop
 
