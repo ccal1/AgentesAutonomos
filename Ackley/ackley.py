@@ -11,8 +11,8 @@ import time
 
 #Constants
 POP_SIZE = 30
-N = 5
-ITERATIONS = 1000
+N = 2
+ITERATIONS = 10000
 
 def comp_EE(x):
     return x.fitness
@@ -50,7 +50,7 @@ def main():
     #printing Number Iterations till converge
     number_it_list = np.array(number_it_list)
     number_it_mean = np.mean(number_it_list)
-    print("mean of iterations to converge(<= 0.1" + str(number_it_mean))
+    print("mean of iterations to converge" + str(number_it_mean))
     #plotting Means by iteration
     plot_iterations(means, "EE3c", "Average")
     plot_iterations(bests, "EE3c", "Bests")
@@ -72,7 +72,7 @@ def plot_iterations(means, algorithm, title):
     ax.errorbar(x, medias, yerr=desvios)
     ax.set_ylabel(title+'(+ standard deviation)')
     ax.set_xlabel('Iterations(Max = 10000)')
-    ax.set_title(title+' through ' + str(N) + ' iterations with ' + algorithm)
+    ax.set_title('Population ' +title+' through ' + str(N) + ' iterations with ' + algorithm)
     plt.show()
 
 
