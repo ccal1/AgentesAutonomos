@@ -150,6 +150,9 @@ class EE2c:
         tal = 1 / np.sqrt(30)
         newSigma = self.sigma * np.exp(tal * np.random.randn())
 
+        # print(self.sigma)
+        # print(newSigma)
+        # print(self.threshold)
         if self.threshold > newSigma:
             newSigma = self.threshold
 
@@ -159,11 +162,7 @@ class EE2c:
         newSigma = self.calc_sigma()
         cromossomTemp = self.cromossom + newSigma * np.random.randn(30)
 
-        newMember = EE2c()
-        newMember.set_cromossom(cromossomTemp)
-        newMember.set_sigma(newSigma)
-        newMember.set_fitness()
-
+        newMember = EE2c(cromossomTemp, newSigma)
         return newMember
 
     def replace_with(self, child):
@@ -175,8 +174,6 @@ class EE2c:
         child = self.calc_mutation()
         if child.fitness <= self.fitness:
             self.replace_with(child)
-        else:
-            self.sigma = child.sigma
 
         self.it_number += 1
 
@@ -209,7 +206,7 @@ class EE3:
         self.threshold = 0.5
 
     def calc_sigma(self):
-        new_sigma = self.sigma * np.exp(self.t * np.random.randn(30) + self.tl * np.random.randn(30))
+        new_sigma = self.sigma * np.exp(self.t * np.random.randn() + self.tl * np.random.randn(30))
         return np.maximum(new_sigma, self.threshold + np.zeros(30))
 
     def replace_with(self, child):
@@ -227,6 +224,9 @@ class EE3:
         child = self.calc_mutation()
         if child.fitness <= self.fitness:
             self.replace_with(child)
+
+        if (not (self.it_number % 10)):
+            self.threshold /= 2
         # if self.it_number %100 ==0:
         #     self.sigma = np.random.random()
         
@@ -267,7 +267,7 @@ class EE3c:
         self.sigma = np.random.random(30)
 
     def calc_sigma(self):
-        new_sigma = self.sigma * np.exp(self.t * np.random.randn() * np.random.randn() + self.tl * np.random.randn())
+        new_sigma = self.sigma * np.exp(self.t * np.random.randn(30) + self.tl * np.random.randn())
         return np.maximum(new_sigma, self.threshold + np.zeros(30))
 
     def replace_with(self, child):
@@ -288,7 +288,7 @@ class EE3c:
 
         self.it_number += 1
         if (not (self.it_number % 10)):
-            self.threshold /= 1.1
+            self.threshold /= 2
 
     def crossover_complete(self, other):
         alpha = 0.5

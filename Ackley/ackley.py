@@ -11,7 +11,7 @@ import time
 
 #Constants
 POP_SIZE = 30
-N = 2
+N = 5
 ITERATIONS = 10000
 
 def comp_EE(x):
@@ -52,8 +52,9 @@ def main():
     number_it_mean = np.mean(number_it_list)
     print("mean of iterations to converge" + str(number_it_mean))
     #plotting Means by iteration
-    plot_iterations(means, "EE3c", "Average")
-    plot_iterations(bests, "EE3c", "Bests")
+    plot_iterations_dots(means, "EE3c", "Average")
+    plot_iterations_dots(bests, "EE3c", "Bests")
+    plot_both(means,bests, "EE2c", "Average and Best")
 
 
 def plot_iterations(means, algorithm, title):
@@ -75,7 +76,50 @@ def plot_iterations(means, algorithm, title):
     ax.set_title('Population ' +title+' through ' + str(N) + ' iterations with ' + algorithm)
     plt.show()
 
+def plot_iterations_dots(means, algorithm, title):
+    values = []
+    medias = []
+    desvios = []
+    for i in range(0,ITERATIONS):
+        for j in range(0,N):
+            values.append(means[j][i])
+        values = np.array(values)
+        medias.append(np.mean(values))
+        desvios.append(np.std(values))
+        values = []
+    x = np.arange(0, len(medias))
+    fig, ax = plt.subplots(2, sharex=True)
+    ax[0].plot(x, medias)
+    ax[0].set_ylabel('Average')
+    ax[0].set_title('Polulation ' + title + ' through 30' + ' iterations with ' + algorithm)
+    ax[1].plot(x, desvios)
+    ax[1].set_ylabel('Standard Deviation')
+    ax[1].set_xlabel('Iterations')
+    plt.show()
 
+def plot_both(means, best, algorithm, title):
+    values = []
+    medias = []
+    bests = []
+    melhores = []
+    for i in range(0,ITERATIONS):
+        for j in range(0,N):
+            values.append(means[j][i])
+            bests.append(best[j][i])
+        bests = np.array(bests)
+        values = np.array(values)
+        medias.append(np.mean(values))
+        melhores.append(np.mean(bests))
+        values = []
+        bests = []
+    x = np.arange(0, len(medias))
+    fig, ax = plt.subplots()
+    ax.plot(x, medias)
+    ax.set_ylabel('Average and best(red)')
+    ax.set_title('Polulation ' + title + ' through 30' + ' iterations with ' + algorithm)
+    ax.plot(x, melhores, 'r')
+
+    plt.show()
 
 def generate_pop():
     pop = []
